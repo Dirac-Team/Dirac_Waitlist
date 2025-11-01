@@ -4,9 +4,8 @@ export default function Home() {
   return (
     <Hero
       eyebrow="MVP is Coming soon"
-      title="F*ck Repeated Work"
-      subtitle="The AI Fullstack Engineer. Build prototypes, apps, and websites with the power of AI."
-      ctaLabel="Get Started"
+      subtitle="Complete task with AI, doing repeated task with AI"
+      ctaLabel="Join The Waitlist"
       ctaHref="/waitlist"
     />
   );

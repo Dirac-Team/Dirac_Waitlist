@@ -20,7 +20,7 @@ const AnimatedNavLink = ({ href, children }: { href: string; children: React.Rea
 export function Navbar() {
   const navLinksData = [
     { label: 'Home', href: '/' },
-    { label: 'About us', href: '#about' },
+    { label: 'About us', href: '/about' },
     { label: 'Waitlist', href: '/waitlist' },
     { label: 'Contact us', href: '#contact' },
   ];

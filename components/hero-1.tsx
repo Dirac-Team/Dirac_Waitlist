@@ -2,10 +2,11 @@
 
 import { ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
 
 interface HeroProps {
   eyebrow?: string
-  title: string
+  title?: string
   subtitle: string
   ctaLabel?: string
   ctaHref?: string
@@ -18,6 +19,43 @@ export function Hero({
   ctaLabel = "Explore Now",
   ctaHref = "#",
 }: HeroProps) {
+  const words = ["Repeated Work", "Busywork", "Manual Labor", "Tedious Tasks", "Monkey Work"];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentText, setCurrentText] = useState("");
+
+  useEffect(() => {
+    const currentWord = words[currentIndex % words.length];
+    
+    if (!isDeleting) {
+      // Typing
+      if (currentText.length < currentWord.length) {
+        const timeout = setTimeout(() => {
+          setCurrentText(currentWord.slice(0, currentText.length + 1));
+        }, 100);
+        return () => clearTimeout(timeout);
+      } else {
+        // Finished typing, wait then start deleting
+        const timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2000);
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      // Deleting
+      if (currentText.length > 0) {
+        const timeout = setTimeout(() => {
+          setCurrentText(currentText.slice(0, -1));
+        }, 50);
+        return () => clearTimeout(timeout);
+      } else {
+        // Finished deleting, move to next word
+        setIsDeleting(false);
+        setCurrentIndex((prev) => (prev + 1) % words.length);
+      }
+    }
+  }, [currentText, currentIndex, isDeleting]);
+
   return (
     <section
       id="hero"
@@ -61,16 +99,34 @@ export function Hero({
         </a>
       )}
 
-      {/* Title */}
+      {/* Animated Slogan */}
       <h1
         className="animate-fade-in -translate-y-4 text-balance 
         bg-gradient-to-br from-black from-30% to-black/40 
-        bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tighter 
-        text-transparent opacity-0 sm:text-6xl md:text-7xl lg:text-8xl 
-        dark:from-white dark:to-white/40"
+        bg-clip-text py-6 text-6xl font-bold leading-none tracking-tighter 
+        text-transparent sm:text-7xl md:text-8xl lg:text-9xl 
+        dark:from-white dark:to-white/40 mb-4"
+        style={{ lineHeight: '1.1' }}
       >
-        {title}
+        F*ck{" "}
+        <span className="inline-block min-w-[400px] sm:min-w-[500px] md:min-w-[600px]">
+          {currentText}
+          <span className="animate-pulse">|</span>
+        </span>
       </h1>
+
+      {/* Title (optional) */}
+      {title && (
+        <h2
+          className="animate-fade-in -translate-y-4 text-balance 
+          bg-gradient-to-br from-black from-30% to-black/40 
+          bg-clip-text py-6 text-5xl font-semibold leading-none tracking-tighter 
+          text-transparent opacity-0 sm:text-6xl md:text-7xl lg:text-8xl 
+          dark:from-white dark:to-white/40"
+        >
+          {title}
+        </h2>
+      )}
 
       {/* Subtitle */}
       <p
@@ -84,12 +140,50 @@ export function Hero({
       {/* CTA */}
       {ctaLabel && (
         <div className="flex justify-center">
-          <Button
-            asChild
-            className="mt-[-20px] w-fit md:w-52 z-20 font-geist tracking-tighter text-center text-lg"
+          <a 
+            href={ctaHref}
+            className="group relative inline-flex items-center justify-center px-8 py-4 mt-[-20px] z-20 
+            bg-white dark:bg-white/10
+            text-black dark:text-white font-bold text-lg tracking-tight rounded-full
+            border-2 border-black dark:border-white/30
+            shadow-[5px_5px_0px_0px_rgba(0,0,0,0.8)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.3)]
+            hover:shadow-[7px_7px_0px_0px_rgba(0,0,0,0.9)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,255,255,0.4)]
+            hover:translate-x-[-2px] hover:translate-y-[-2px]
+            active:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.7)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]
+            active:translate-x-[2px] active:translate-y-[2px]
+            transition-all duration-200 ease-out
+            overflow-hidden
+            min-w-[200px]
+            rotate-[-0.5deg] hover:rotate-[0.5deg] hover:scale-105"
           >
-            <a href={ctaHref}>{ctaLabel}</a>
-          </Button>
+            {/* Subtle glitch layer */}
+            <span className="absolute inset-0 rounded-full bg-black dark:bg-white opacity-0 group-hover:opacity-[0.05] group-hover:animate-glitch pointer-events-none transition-opacity duration-200"></span>
+            
+            {/* Smooth hover fill */}
+            <span className="absolute inset-0 bg-black dark:bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out"></span>
+            
+            {/* Button text */}
+            <span className="relative z-10 flex items-center gap-2 whitespace-nowrap transition-all duration-200">
+              <span className="text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors duration-300">
+                {ctaLabel}
+              </span>
+              <ChevronRight className="w-5 h-5 text-black dark:text-white group-hover:text-white dark:group-hover:text-black group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" />
+            </span>
+            
+            {/* Natural crack pattern */}
+            <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none opacity-[0.15]">
+              {/* Subtle vertical cracks */}
+              <div className="absolute top-0 left-[15%] w-[1px] h-10 bg-black dark:bg-white rotate-[10deg]"></div>
+              <div className="absolute bottom-0 right-[20%] w-[1px] h-8 bg-black dark:bg-white rotate-[-12deg]"></div>
+              
+              {/* Subtle horizontal cracks */}
+              <div className="absolute top-[50%] left-[8%] w-10 h-[1px] bg-black dark:bg-white rotate-[35deg]"></div>
+              <div className="absolute top-[45%] right-[10%] w-12 h-[1px] bg-black dark:bg-white rotate-[-38deg]"></div>
+              
+              {/* Slight diagonal accent */}
+              <div className="absolute top-[25%] left-[48%] w-16 h-[1px] bg-black dark:bg-white rotate-[55deg] opacity-60"></div>
+            </div>
+          </a>
         </div>
       )}
 
