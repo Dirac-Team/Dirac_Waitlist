@@ -10,14 +10,14 @@ export default function WaitlistPage() {
 
   useEffect(() => {
     if (showConfetti) {
-      const timer = setTimeout(() => setShowConfetti(false), 3000);
+      const timer = setTimeout(() => setShowConfetti(false), 2000);
       return () => clearTimeout(timer);
     }
   }, [showConfetti]);
 
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => setMessage(null), 4000);
+      const timer = setTimeout(() => setMessage(null), 3000);
       return () => clearTimeout(timer);
     }
   }, [message]);
@@ -83,8 +83,8 @@ export default function WaitlistPage() {
               className="absolute animate-confetti"
               style={{
                 left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: `${2 + Math.random() * 2}s`,
+                animationDelay: `${Math.random() * 0.2}s`,
+                animationDuration: `${1 + Math.random() * 1}s`,
                 background: ['#000', '#fff', '#333'][Math.floor(Math.random() * 3)],
                 width: '8px',
                 height: '8px',
