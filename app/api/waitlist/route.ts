@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     if (resendApiKey) {
       try {
         const emailResult = await resend.emails.send({
-          from: "Dirac <noreply@dirac.app>",
+          from: "peter@dirac.app",
           to: email,
           subject: "You're on the Dirac Waitlist",
           html: `
@@ -129,8 +129,8 @@ export async function POST(request: NextRequest) {
         
         console.log("Email sent successfully:", {
           to: email,
-          id: emailResult?.id,
-          from: "noreply@dirac.app"
+          id: emailResult?.data?.id ?? undefined,
+          from: "peter@dirac.app"
         });
       } catch (emailError: any) {
         console.error("Error sending email:", {
