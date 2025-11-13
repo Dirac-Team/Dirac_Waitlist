@@ -47,48 +47,98 @@ export async function POST(request: NextRequest) {
     // Send confirmation email (only if Resend is configured)
     if (resendApiKey) {
       try {
-        await resend.emails.send({
-        from: "onboarding@resend.dev", // Update this with your verified domain
-        to: email,
-        subject: "Welcome to the Waitlist!",
-        html: `
+        const emailResult = await resend.emails.send({
+          from: "Dirac <noreply@dirac.app>",
+          to: email,
+          subject: "You're on the Dirac Waitlist",
+          html: `
           <!DOCTYPE html>
-          <html>
+          <html lang="en">
             <head>
               <meta charset="utf-8">
-              <title>Welcome to the Waitlist</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Welcome to Dirac</title>
             </head>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-                <h1 style="color: white; margin: 0;">🎉 You're on the Waitlist!</h1>
-              </div>
-              <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-                <p style="font-size: 18px; margin-bottom: 20px;">Hi there,</p>
-                <p style="font-size: 16px; margin-bottom: 20px;">
-                  Thank you for joining our waitlist! We're excited to have you on board.
-                </p>
-                <p style="font-size: 16px; margin-bottom: 20px;">
-                  We'll notify you as soon as our MVP is available. Stay tuned for updates!
-                </p>
-                <div style="background: white; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #667eea;">
-                  <p style="margin: 0; font-weight: bold;">What's Next?</p>
-                  <ul style="margin: 10px 0; padding-left: 20px;">
-                    <li>You'll receive priority access when we launch</li>
-                    <li>We'll keep you updated on our progress</li>
-                    <li>Expect exclusive early access opportunities</li>
-                  </ul>
-                </div>
-                <p style="font-size: 14px; color: #666; margin-top: 30px;">
-                  Best regards,<br>
-                  The Team
-                </p>
-              </div>
+            <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #000000;">
+              <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #ffffff;">
+                <tr>
+                  <td style="padding: 0;">
+                    <!-- Container -->
+                    <table role="presentation" style="width: 100%; max-width: 600px; margin: 0 auto; border-collapse: collapse;">
+                      <!-- Header Spacer -->
+                      <tr>
+                        <td style="padding: 60px 40px 40px 40px; text-align: center;">
+                          <h1 style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -0.02em; color: #000000; line-height: 1.2;">
+                            You're on the<br>Waitlist
+                          </h1>
+                        </td>
+                      </tr>
+                      
+                      <!-- Grid Pattern Background -->
+                      <tr>
+                        <td style="padding: 0 40px; position: relative;">
+                          <div style="position: relative; background-image: linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px); background-size: 24px 24px; padding: 40px; border: 2px solid #000000;">
+                            <!-- Content -->
+                            <div style="position: relative; z-index: 1;">
+                              <p style="margin: 0 0 24px 0; font-size: 18px; color: #000000; font-weight: 500;">
+                                Thank you for joining the Dirac waitlist.
+                              </p>
+                              <p style="margin: 0 0 32px 0; font-size: 16px; color: #333333; line-height: 1.7;">
+                                We're building something special — an AI agent that automates your Mac, no coding required. You'll be among the first to know when our MVP is ready.
+                              </p>
+                              
+                              <!-- Info Box -->
+                              <div style="border: 2px solid #000000; padding: 24px; margin: 32px 0; background-color: #ffffff;">
+                                <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #000000; text-transform: uppercase; letter-spacing: 0.05em;">
+                                  What's Next
+                                </p>
+                                <ul style="margin: 0; padding-left: 20px; color: #333333; font-size: 15px; line-height: 1.8;">
+                                  <li style="margin-bottom: 8px;">Priority access when we launch</li>
+                                  <li style="margin-bottom: 8px;">Updates on our progress</li>
+                                  <li>Exclusive early access opportunities</li>
+                                </ul>
+                              </div>
+                              
+                              <p style="margin: 32px 0 0 0; font-size: 15px; color: #666666; line-height: 1.6;">
+                                We'll be in touch soon.
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      
+                      <!-- Footer -->
+                      <tr>
+                        <td style="padding: 40px 40px 60px 40px; text-align: center; border-top: 1px solid #e0e0e0;">
+                          <p style="margin: 0 0 8px 0; font-size: 14px; color: #000000; font-weight: 600;">
+                            Dirac
+                          </p>
+                          <p style="margin: 0; font-size: 13px; color: #666666;">
+                            Automate your Mac. No coding required.
+                          </p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </body>
           </html>
         `,
         });
-      } catch (emailError) {
-        console.error("Error sending email:", emailError);
+        
+        console.log("Email sent successfully:", {
+          to: email,
+          id: emailResult?.id,
+          from: "noreply@dirac.app"
+        });
+      } catch (emailError: any) {
+        console.error("Error sending email:", {
+          error: emailError,
+          message: emailError?.message,
+          to: email,
+          stack: emailError?.stack
+        });
         // Don't fail the request if email fails, just log it
       }
     } else {
