@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Navbar } from "@/components/ui/mini-navbar";
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white dark:bg-black">
+      <Navbar />
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto">
         <div className="text-center space-y-6 mb-16">

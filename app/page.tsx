@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <Hero
       eyebrow="MVP is Coming soon"
-      subtitle="Complete task with AI, doing repeated task with AI"
+      subtitle="Never have to do the same task twice"
       ctaLabel="Join The Waitlist"
       ctaHref="/waitlist"
     />
