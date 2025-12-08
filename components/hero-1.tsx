@@ -2,7 +2,6 @@
 
 import { ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useEffect, useState } from "react"
 
 interface HeroProps {
   eyebrow?: string
@@ -19,42 +18,6 @@ export function Hero({
   ctaLabel = "Explore Now",
   ctaHref = "#",
 }: HeroProps) {
-  const words = ["Repeated Work", "Busywork", "Manual Labor", "Tedious Tasks", "Monkey Work"];
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [currentText, setCurrentText] = useState("");
-
-  useEffect(() => {
-    const currentWord = words[currentIndex % words.length];
-    
-    if (!isDeleting) {
-      // Typing
-      if (currentText.length < currentWord.length) {
-        const timeout = setTimeout(() => {
-          setCurrentText(currentWord.slice(0, currentText.length + 1));
-        }, 100);
-        return () => clearTimeout(timeout);
-      } else {
-        // Finished typing, wait then start deleting
-        const timeout = setTimeout(() => {
-          setIsDeleting(true);
-        }, 2000);
-        return () => clearTimeout(timeout);
-      }
-    } else {
-      // Deleting
-      if (currentText.length > 0) {
-        const timeout = setTimeout(() => {
-          setCurrentText(currentText.slice(0, -1));
-        }, 50);
-        return () => clearTimeout(timeout);
-      } else {
-        // Finished deleting, move to next word
-        setIsDeleting(false);
-        setCurrentIndex((prev) => (prev + 1) % words.length);
-      }
-    }
-  }, [currentText, currentIndex, isDeleting]);
 
   return (
     <section
@@ -103,16 +66,12 @@ export function Hero({
       <h1
         className="animate-fade-in -translate-y-4 text-balance 
         bg-gradient-to-br from-black from-30% to-black/40 
-        bg-clip-text py-6 text-6xl font-bold leading-none tracking-tighter 
-        text-transparent sm:text-7xl md:text-8xl lg:text-9xl 
+        bg-clip-text py-6 text-5xl font-bold leading-none tracking-tighter 
+        text-transparent sm:text-6xl md:text-7xl lg:text-8xl 
         dark:from-white dark:to-white/40 mb-4"
         style={{ lineHeight: '1.1' }}
       >
-        F*ck{" "}
-        <span className="inline-block min-w-[400px] sm:min-w-[500px] md:min-w-[600px]">
-          {currentText}
-          <span className="animate-pulse">|</span>
-        </span>
+        Your morning routine<br />in 60 seconds
       </h1>
 
       {/* Title (optional) */}

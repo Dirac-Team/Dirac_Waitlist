@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
                                 Thank you for joining the Dirac waitlist.
                               </p>
                               <p style="margin: 0 0 32px 0; font-size: 16px; color: #333333; line-height: 1.7;">
-                                We're building something special — an AI agent that automates your Mac, no coding required. You'll be among the first to know when our MVP is ready.
+                                We're building Start My Day — automatically check all your morning apps with one click. Instead of manually opening GitHub, Stripe, Gmail, and analytics across 10+ tabs, Dirac visits each app and presents everything in a single summary view. Your entire morning routine in 60 seconds.
                               </p>
                               
                               <!-- Info Box -->
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
                             Dirac
                           </p>
                           <p style="margin: 0; font-size: 13px; color: #666666;">
-                            Automate your Mac. No coding required.
+                            Your morning routine in 60 seconds.
                           </p>
                         </td>
                       </tr>

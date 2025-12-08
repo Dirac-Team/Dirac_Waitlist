@@ -68,7 +68,7 @@ export default function WaitlistPage() {
     <div className="relative overflow-hidden">
       <HeroWave
         title="Join The Waitlist"
-        subtitle="Join the waitlist to test our MVP"
+        subtitle="Get early access to Dirac — your morning routine in 60 seconds"
         placeholder="xxxxxxx@gmail.com"
         buttonText={isSubmitting ? "Joining..." : "Join"}
         onPromptSubmit={handleSubmit}

@@ -53,10 +53,10 @@ export default function ContactPage() {
         <section className="text-center py-20 border-t-2 border-black dark:border-white/30">
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-black dark:text-white">
-              Ready to automate your Mac?
+              Ready to start your day in 60 seconds?
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300">
-              Join the waitlist and be among the first to experience Dirac.
+              Join the waitlist and be among the first to experience Start My Day.
             </p>
             
             <div className="pt-6">

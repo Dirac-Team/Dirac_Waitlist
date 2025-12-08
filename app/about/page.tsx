@@ -15,10 +15,10 @@ export default function AboutPage() {
           {/* Hero Intro */}
           <div className="space-y-4 text-lg text-gray-700 dark:text-gray-300 max-w-2xl mx-auto">
             <p className="text-2xl font-semibold text-black dark:text-white">
-              Dirac helps you automate your Mac — no coding required.
+              Dirac automatically checks all your morning apps with one click.
             </p>
             <p>
-              We built Dirac so students, freelancers, and entrepreneurs can eliminate repetitive tasks and focus on what really matters.
+              Instead of manually opening GitHub, Stripe, Gmail, and analytics across dozens of platforms, Dirac visits each app, captures the important information, and presents everything in a single summary view.
             </p>
           </div>
         </div>
@@ -33,31 +33,31 @@ export default function AboutPage() {
           </h2>
           
           <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            Dirac is a desktop automation tool for macOS that makes your computer work for you.
+            Dirac's "Start My Day" feature automatically checks all your morning apps with one click.
           </p>
           
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            Whether you're sending reports, organizing files, or filling out forms, Dirac automates the clicks and keystrokes you repeat every day.
+            Instead of manually opening GitHub, Stripe, Gmail, and analytics across 10+ tabs, Dirac visits each app, captures the important information, and presents everything in a single summary view. Your entire morning routine in 60 seconds.
           </p>
 
           <div className="space-y-4 pt-6">
-            <p className="font-semibold text-black dark:text-white">You can:</p>
+            <p className="font-semibold text-black dark:text-white">With Start My Day, you can:</p>
             <ul className="space-y-3 text-gray-700 dark:text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Record tasks once and replay them anytime with <span className="font-semibold">Repeat Mode</span>.</span>
+                <span>Check all your morning apps with <span className="font-semibold">one click</span> — no more opening 10+ tabs manually.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Type what you want in plain English and watch Dirac do it for you with <span className="font-semibold">Agent Mode</span>.</span>
+                <span>Get a <span className="font-semibold">single summary view</span> of everything important from GitHub, Stripe, Gmail, and analytics.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Automate any app on your Mac — email, browser, spreadsheets, or creative tools.</span>
+                <span>Complete your entire morning routine in <span className="font-semibold">60 seconds</span> instead of 10+ minutes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Stay safe and private, since everything runs locally on your device.</span>
+                <span>Stay safe and private, since everything runs locally on your Mac.</span>
               </li>
             </ul>
           </div>
@@ -73,36 +73,36 @@ export default function AboutPage() {
           </h2>
           
           <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            We built Dirac for people who are tired of wasting hours on small, repetitive actions.
+            We built Start My Day for people who are tired of wasting time every morning opening the same apps and checking the same information.
           </p>
 
-          <p className="font-semibold text-black dark:text-white pt-2">With Dirac, you can:</p>
+          <p className="font-semibold text-black dark:text-white pt-2">With Start My Day, you can:</p>
           
           <div className="grid md:grid-cols-2 gap-4 pt-4">
             <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">Save hours every week</span> on manual computer work
+                <span className="font-semibold text-black dark:text-white">Start your day faster</span> — complete your morning routine in 60 seconds
               </p>
             </div>
             <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">Avoid mistakes</span> and repetitive strain
+                <span className="font-semibold text-black dark:text-white">See everything at once</span> — all your important info in one summary view
               </p>
             </div>
             <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">Focus on creative work</span> that matters
+                <span className="font-semibold text-black dark:text-white">No more tab chaos</span> — stop opening 10+ tabs every morning
               </p>
             </div>
             <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">Feel in control</span> of your time
+                <span className="font-semibold text-black dark:text-white">One click</span> to check GitHub, Stripe, Gmail, and analytics
               </p>
             </div>
           </div>
 
           <p className="text-lg font-semibold text-black dark:text-white pt-4">
-            In short — Dirac helps you work smarter, not harder.
+            In short — Start My Day gives you your mornings back.
           </p>
         </section>
 
@@ -119,14 +119,14 @@ export default function AboutPage() {
             <div className="p-6 border-l-4 border-black dark:border-white rounded-lg">
               <h3 className="text-xl font-bold text-black dark:text-white mb-2">Mission</h3>
               <p className="text-gray-700 dark:text-gray-300">
-                Make desktop automation accessible to everyone, regardless of technical ability.
+                Make morning routines effortless — one click to check everything that matters.
               </p>
             </div>
             
             <div className="p-6 border-l-4 border-black dark:border-white rounded-lg">
               <h3 className="text-xl font-bold text-black dark:text-white mb-2">Vision</h3>
               <p className="text-gray-700 dark:text-gray-300">
-                Become the default way non-developers automate their digital workflows — a personal assistant that lives on your Mac and understands you.
+                Become the default way people start their day — eliminating the chaos of opening multiple tabs and apps every morning.
               </p>
             </div>
           </div>
@@ -143,13 +143,13 @@ export default function AboutPage() {
           
           <div className="space-y-4 text-gray-700 dark:text-gray-300 leading-relaxed">
             <p>
-              Dirac was born from frustration — we were tired of wasting hours doing the same computer tasks again and again.
+              Dirac was born from frustration — we were tired of wasting time every morning opening the same apps, checking the same tabs, and gathering the same information.
             </p>
             <p>
-              We're a small team of builders, designers, and productivity enthusiasts who believe automation shouldn't be limited to programmers.
+              We're a small team of builders, designers, and productivity enthusiasts who believe your morning routine shouldn't take 10+ minutes when it can be done in 60 seconds.
             </p>
             <p>
-              Our goal is simple: give every Mac user the power to automate their work in minutes, not hours — no coding, no complexity, just results.
+              Our goal is simple: one click to check all your morning apps and see everything that matters in a single summary view.
             </p>
           </div>
         </section>
@@ -161,10 +161,10 @@ export default function AboutPage() {
         <section className="text-center py-20 border-t-2 border-black dark:border-white/30">
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-black dark:text-white">
-              Ready to make your Mac work for you?
+              Ready to start your day in 60 seconds?
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300">
-              Try Dirac today and experience what true desktop automation feels like.
+              Join the waitlist and be among the first to experience Start My Day.
             </p>
             
             <div className="pt-6">

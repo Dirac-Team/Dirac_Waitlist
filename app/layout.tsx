@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dirac Ai Agent",
-  description: "The Ai agent which works like your clone",
+  title: "Dirac - Start My Day",
+  description: "Automatically check all your morning apps with one click. GitHub, Stripe, Gmail, and analytics in a single summary view. Your entire morning routine in 60 seconds.",
 };
 
 export default function RootLayout({
