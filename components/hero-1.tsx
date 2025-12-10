@@ -71,7 +71,7 @@ export function Hero({
         dark:from-white dark:to-white/40 mb-4"
         style={{ lineHeight: '1.1' }}
       >
-        Your morning routine<br />in 60 seconds
+        Your morning in 60 seconds
       </h1>
 
       {/* Title (optional) */}
