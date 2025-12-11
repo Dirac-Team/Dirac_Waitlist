@@ -21,6 +21,7 @@ export function Navbar() {
   const navLinksData = [
     { label: 'Home', href: '/' },
     { label: 'About us', href: '/about' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'Waitlist', href: '/waitlist' },
     { label: 'Contact us', href: '/contact' },
   ];
