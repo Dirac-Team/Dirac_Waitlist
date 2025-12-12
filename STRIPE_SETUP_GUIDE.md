@@ -64,46 +64,9 @@ DIRAC_BACKEND_URL=http://localhost:8000
    DIRAC_BACKEND_URL=https://your-backend-url.com
    ```
 
-### 5. Update Your Dirac Backend
+### 5. Test Locally
 
-Your FastAPI backend needs a new endpoint to create licenses. Add this endpoint:
-
-```python
-@app.post("/license/create")
-async def create_license_endpoint(data: dict):
-    email = data.get("email")
-    if not email:
-        raise HTTPException(status_code=400, detail="Email is required")
-    
-    # Call your existing create_license function
-    license_key = create_license(email)
-    
-    return {"license_key": license_key}
-```
-
-**Make sure your backend allows CORS** from `https://dirac.app`:
-
-```python
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://dirac.app", "http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-```
-
-### 6. Test Locally
-
-1. Start your backend:
-   ```bash
-   # In your Dirac backend directory
-   python -m uvicorn main:app --reload
-   ```
-
-2. Start your Next.js dev server:
+1. Start your Next.js dev server:
    ```bash
    cd Dirac_Waitlist
    npm run dev
@@ -118,25 +81,75 @@ app.add_middleware(
    - ZIP: Any 5 digits
 
 6. After payment, you should be redirected to `/payment/success` with a license key
+7. Copy the license key and test it:
+   ```bash
+   curl -X POST http://localhost:3000/api/license/verify \
+     -H "Content-Type: application/json" \
+     -d '{"key":"DIRAC-XXXX-YYYY"}'
+   ```
 
-### 7. Set Up Stripe Webhooks (For Production)
+### 6. Set Up Firestore Security Rules
 
-Webhooks ensure your backend knows when payments succeed/fail:
+In Firebase Console → Firestore → Rules, add:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Licenses - server-side only
+    match /licenses/{licenseId} {
+      allow read, write: if false;
+    }
+    
+    // Waitlist - allow anonymous writes
+    match /waitlist/{email} {
+      allow read: if false;
+      allow write: if request.auth == null;
+    }
+  }
+}
+```
+
+### 7. Set Up Stripe Webhooks (Optional - For Subscription Cancellations)
+
+If you want to automatically deactivate licenses when subscriptions are canceled:
 
 1. Go to **Developers** → **Webhooks** in Stripe Dashboard
 2. Click **Add endpoint**
-3. Set endpoint URL to: `https://your-backend-url.com/stripe/webhook`
+3. Set endpoint URL to: `https://dirac.app/api/stripe/webhook`
 4. Select events to listen for:
-   - `checkout.session.completed`
-   - `customer.subscription.created`
    - `customer.subscription.deleted`
-   - `invoice.payment_succeeded`
-   - `invoice.payment_failed`
+   - `customer.subscription.updated`
 5. Click **Add endpoint**
 6. Copy the **Signing secret** (starts with `whsec_`)
-7. Add it to your backend environment variables as `STRIPE_WEBHOOK_SECRET`
+7. Add it to Netlify environment variables as `STRIPE_WEBHOOK_SECRET`
 
-### 8. Deploy to Production
+(See LICENSE_SYSTEM.md for webhook implementation code)
+
+### 8. Desktop App Integration
+
+Your Dirac macOS app should call the license verification API:
+
+```javascript
+// When user clicks "Activate" with license key
+const response = await fetch('https://dirac.app/api/license/verify', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ key: licenseKey })
+});
+
+const data = await response.json();
+
+if (data.status === 'active') {
+  // ✅ Unlock app
+} else {
+  // ❌ Show error
+}
+```
+
+See `LICENSE_SYSTEM.md` for complete desktop app integration guide.
+
+### 9. Deploy to Production
 
 1. Commit your changes:
    ```bash

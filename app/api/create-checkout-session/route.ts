@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 4,
       },
+      allow_promotion_codes: true, // Optional: allow discount codes
     });
 
     return NextResponse.json({ url: session.url }, { status: 200 });

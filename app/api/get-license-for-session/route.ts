@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getDb } from "@/lib/firebase";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { generateLicenseKey } from "@/lib/license";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2025-11-17.clover",
@@ -27,41 +30,74 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const email = session.customer_email || session.customer_details?.email;
+    const email = (session.customer_email || session.customer_details?.email)!;
+    const subscriptionId = session.subscription as string;
 
-    // Call your Dirac backend to create a license
-    // Option 1: If you have a backend endpoint
-    const backendUrl = process.env.DIRAC_BACKEND_URL || "http://localhost:8000";
-    
-    try {
-      const response = await fetch(`${backendUrl}/license/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
+    // Get Firestore instance
+    const db = getDb();
+    const licensesRef = collection(db, "licenses");
 
-      if (!response.ok) {
-        throw new Error("Failed to create license from backend");
-      }
+    // Check if this email already has a license from this session
+    const existingQuery = query(
+      licensesRef,
+      where("email", "==", email.toLowerCase().trim()),
+      where("stripeSessionId", "==", sessionId)
+    );
+    const existingDocs = await getDocs(existingQuery);
 
-      const data = await response.json();
-      
+    if (!existingDocs.empty) {
+      // Return existing license key
+      const existingLicense = existingDocs.docs[0].data();
       return NextResponse.json(
         { 
-          licenseKey: data.license_key,
+          licenseKey: existingLicense.key,
           email: email 
         },
         { status: 200 }
       );
-    } catch (backendError) {
-      console.error("Backend error:", backendError);
-      return NextResponse.json(
-        { error: "Failed to generate license key. Please contact support." },
-        { status: 500 }
-      );
     }
+
+    // Generate a new unique license key
+    let licenseKey = generateLicenseKey();
+    
+    // Ensure uniqueness (very unlikely collision, but safe)
+    let attempts = 0;
+    while (attempts < 10) {
+      const keyQuery = query(licensesRef, where("key", "==", licenseKey));
+      const keyDocs = await getDocs(keyQuery);
+      
+      if (keyDocs.empty) {
+        break; // Key is unique
+      }
+      
+      licenseKey = generateLicenseKey();
+      attempts++;
+    }
+
+    // Store license in Firestore
+    await addDoc(licensesRef, {
+      key: licenseKey,
+      email: email.toLowerCase().trim(),
+      status: "active",
+      createdAt: new Date().toISOString(),
+      stripeSessionId: sessionId,
+      stripeSubscriptionId: subscriptionId || null,
+      stripeCustomerId: session.customer as string || null,
+    });
+
+    console.log("License created:", {
+      key: licenseKey,
+      email: email,
+      sessionId: sessionId,
+    });
+
+    return NextResponse.json(
+      { 
+        licenseKey: licenseKey,
+        email: email 
+      },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.error("Error getting license for session:", error);
     return NextResponse.json(
@@ -70,4 +106,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
