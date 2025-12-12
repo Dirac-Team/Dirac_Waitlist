@@ -1,11 +1,11 @@
 "use client";
 
 import { Navbar } from "@/components/ui/mini-navbar";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
@@ -167,3 +167,18 @@ export default function PaymentSuccessPage() {
   );
 }
 
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white dark:bg-black">
+        <Navbar />
+        <section className="pt-32 pb-20 px-6 md:px-8 max-w-3xl mx-auto text-center">
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-black dark:border-white border-r-transparent"></div>
+          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">Loading...</p>
+        </section>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
+  );
+}
