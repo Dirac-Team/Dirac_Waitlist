@@ -41,7 +41,7 @@ export function Hero({
       <div
         className="absolute left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] 
         h-[500px] w-[700px] md:h-[500px] md:w-[1100px] lg:h-[750px] lg:w-[140%] 
-        -translate-x-1/2 rounded-[100%] border-[#B48CDE] bg-white dark:bg-black 
+        -translate-x-1/2 rounded-[100%] border-black dark:border-white bg-white dark:bg-black 
         bg-[radial-gradient(closest-side,#fff_82%,#000000)] 
         dark:bg-[radial-gradient(closest-side,#000_82%,#ffffff)] 
         animate-fade-up"
@@ -102,13 +102,14 @@ export function Hero({
           <a 
             href={ctaHref}
             className="group relative inline-flex items-center justify-center px-8 py-4 mt-[-20px] z-20 
-            bg-white dark:bg-white/10
-            text-black dark:text-white font-bold text-lg tracking-tight rounded-full
-            border-2 border-black dark:border-white/30
-            shadow-[5px_5px_0px_0px_rgba(0,0,0,0.8)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.3)]
-            hover:shadow-[7px_7px_0px_0px_rgba(0,0,0,0.9)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,255,255,0.4)]
+            bg-[#ed5b25] dark:bg-[#ff6a35]
+            text-white dark:text-white font-bold text-lg tracking-tight rounded-full
+            border-2 border-[#ed5b25] dark:border-[#ff6a35]
+            shadow-[5px_5px_0px_0px_rgba(237,91,37,0.4)] dark:shadow-[5px_5px_0px_0px_rgba(255,106,53,0.4)]
+            hover:shadow-[7px_7px_0px_0px_rgba(237,91,37,0.6)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,106,53,0.6)]
             hover:translate-x-[-2px] hover:translate-y-[-2px]
-            active:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.7)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]
+            hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d]
+            active:shadow-[2px_2px_0px_0px_rgba(237,91,37,0.3)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,106,53,0.3)]
             active:translate-x-[2px] active:translate-y-[2px]
             transition-all duration-200 ease-out
             overflow-hidden
@@ -116,31 +117,31 @@ export function Hero({
             rotate-[-0.5deg] hover:rotate-[0.5deg] hover:scale-105"
           >
             {/* Subtle glitch layer */}
-            <span className="absolute inset-0 rounded-full bg-black dark:bg-white opacity-0 group-hover:opacity-[0.05] group-hover:animate-glitch pointer-events-none transition-opacity duration-200"></span>
+            <span className="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-[0.1] group-hover:animate-glitch pointer-events-none transition-opacity duration-200"></span>
             
             {/* Smooth hover fill */}
-            <span className="absolute inset-0 bg-black dark:bg-white scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out"></span>
+            <span className="absolute inset-0 bg-[#d94e1f] dark:bg-[#ff7d4d] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out"></span>
             
             {/* Button text */}
             <span className="relative z-10 flex items-center gap-2 whitespace-nowrap transition-all duration-200">
-              <span className="text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors duration-300">
+              <span className="text-white transition-colors duration-300">
                 {ctaLabel}
               </span>
-              <ChevronRight className="w-5 h-5 text-black dark:text-white group-hover:text-white dark:group-hover:text-black group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" />
+              <ChevronRight className="w-5 h-5 text-white group-hover:translate-x-1 group-hover:scale-110 transition-all duration-300" />
             </span>
             
             {/* Natural crack pattern */}
             <div className="absolute inset-0 overflow-hidden rounded-full pointer-events-none opacity-[0.15]">
               {/* Subtle vertical cracks */}
-              <div className="absolute top-0 left-[15%] w-[1px] h-10 bg-black dark:bg-white rotate-[10deg]"></div>
-              <div className="absolute bottom-0 right-[20%] w-[1px] h-8 bg-black dark:bg-white rotate-[-12deg]"></div>
+              <div className="absolute top-0 left-[15%] w-[1px] h-10 bg-white rotate-[10deg]"></div>
+              <div className="absolute bottom-0 right-[20%] w-[1px] h-8 bg-white rotate-[-12deg]"></div>
               
               {/* Subtle horizontal cracks */}
-              <div className="absolute top-[50%] left-[8%] w-10 h-[1px] bg-black dark:bg-white rotate-[35deg]"></div>
-              <div className="absolute top-[45%] right-[10%] w-12 h-[1px] bg-black dark:bg-white rotate-[-38deg]"></div>
+              <div className="absolute top-[50%] left-[8%] w-10 h-[1px] bg-white rotate-[35deg]"></div>
+              <div className="absolute top-[45%] right-[10%] w-12 h-[1px] bg-white rotate-[-38deg]"></div>
               
               {/* Slight diagonal accent */}
-              <div className="absolute top-[25%] left-[48%] w-16 h-[1px] bg-black dark:bg-white rotate-[55deg] opacity-60"></div>
+              <div className="absolute top-[25%] left-[48%] w-16 h-[1px] bg-white rotate-[55deg] opacity-60"></div>
             </div>
           </a>
         </div>

@@ -85,7 +85,7 @@ export default function WaitlistPage() {
                 left: `${Math.random() * 100}%`,
                 animationDelay: `${Math.random() * 0.2}s`,
                 animationDuration: `${1 + Math.random() * 1}s`,
-                background: ['#000', '#fff', '#333'][Math.floor(Math.random() * 3)],
+                background: ['#ed5b25', '#ff6a35', '#d94e1f'][Math.floor(Math.random() * 3)],
                 width: '8px',
                 height: '8px',
                 borderRadius: '2px',
@@ -97,10 +97,10 @@ export default function WaitlistPage() {
 
       {message && (
         <div
-          className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 px-8 py-5 rounded-full border-2 animate-slide-up shadow-[4px_4px_0px_0px_rgba(0,0,0,0.8)] ${
+          className={`fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 px-8 py-5 rounded-full border-2 animate-slide-up ${
             message.type === "success"
-              ? "bg-white dark:bg-black border-black dark:border-white text-black dark:text-white"
-              : "bg-red-500 border-red-700 text-white"
+              ? "bg-white dark:bg-black border-[#ed5b25] dark:border-[#ff6a35] text-black dark:text-white shadow-[4px_4px_0px_0px_rgba(237,91,37,0.4)]"
+              : "bg-red-500 border-red-700 text-white shadow-[4px_4px_0px_0px_rgba(220,38,38,0.4)]"
           }`}
           style={{ maxWidth: "90%", width: "auto" }}
         >

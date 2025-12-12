@@ -51,13 +51,23 @@ function PaymentSuccessContent() {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black relative overflow-hidden">
       <Navbar />
       
-      <section className="pt-32 pb-20 px-6 md:px-8 max-w-3xl mx-auto">
+      {/* Fixed Radial Accent Background */}
+      <div
+        className="fixed left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] 
+        h-[500px] w-[700px] md:h-[500px] md:w-[1100px] lg:h-[750px] lg:w-[140%] 
+        -translate-x-1/2 rounded-[100%] border-black dark:border-white bg-white dark:bg-black 
+        bg-[radial-gradient(closest-side,#fff_82%,#000000)] 
+        dark:bg-[radial-gradient(closest-side,#000_82%,#ffffff)] 
+        pointer-events-none -z-10"
+      />
+      
+      <section className="pt-32 pb-20 px-6 md:px-8 max-w-3xl mx-auto relative">
         {isLoading ? (
           <div className="text-center">
-            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-black dark:border-white border-r-transparent"></div>
+            <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-[#ed5b25] dark:border-[#ff6a35] border-r-transparent"></div>
             <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
               Generating your license key...
             </p>
@@ -106,16 +116,16 @@ function PaymentSuccessContent() {
               <h2 className="text-2xl font-bold text-black dark:text-white mb-4">
                 Your License Key
               </h2>
-              <div className="relative p-6 bg-gray-100 dark:bg-gray-900 border-2 border-black dark:border-white rounded-xl">
+                <div className="relative p-6 bg-gray-100 dark:bg-gray-900 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl">
                 <code className="block text-lg md:text-xl font-mono text-black dark:text-white break-all mb-4">
                   {licenseKey}
                 </code>
-                <button
-                  onClick={copyToClipboard}
-                  className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black font-bold rounded-full hover:scale-105 transition-transform"
-                >
-                  {copied ? "Copied!" : "Copy License Key"}
-                </button>
+                  <button
+                    onClick={copyToClipboard}
+                    className="px-6 py-3 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-full hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] hover:scale-105 transition-all"
+                  >
+                    {copied ? "Copied!" : "Copy License Key"}
+                  </button>
               </div>
             </div>
 
@@ -173,7 +183,7 @@ export default function PaymentSuccessPage() {
       <div className="min-h-screen bg-white dark:bg-black">
         <Navbar />
         <section className="pt-32 pb-20 px-6 md:px-8 max-w-3xl mx-auto text-center">
-          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-black dark:border-white border-r-transparent"></div>
+          <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-[#ed5b25] dark:border-[#ff6a35] border-r-transparent"></div>
           <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">Loading...</p>
         </section>
       </div>

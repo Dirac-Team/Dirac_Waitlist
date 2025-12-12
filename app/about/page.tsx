@@ -3,10 +3,21 @@ import { Navbar } from "@/components/ui/mini-navbar";
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black relative overflow-hidden">
       <Navbar />
+      
+      {/* Fixed Radial Accent Background */}
+      <div
+        className="fixed left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] 
+        h-[500px] w-[700px] md:h-[500px] md:w-[1100px] lg:h-[750px] lg:w-[140%] 
+        -translate-x-1/2 rounded-[100%] border-black dark:border-white bg-white dark:bg-black 
+        bg-[radial-gradient(closest-side,#fff_82%,#000000)] 
+        dark:bg-[radial-gradient(closest-side,#000_82%,#ffffff)] 
+        pointer-events-none -z-10"
+      />
+      
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto">
+      <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto relative">
         <div className="text-center space-y-6 mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-black dark:text-white tracking-tight">
             About Dirac
@@ -33,15 +44,15 @@ export default function AboutPage() {
           </h2>
           
           <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            Dirac's "Start My Day" feature automatically checks all your morning apps with one click.
+            Dirac automatically checks all your morning apps with one click.
           </p>
           
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            Instead of manually opening GitHub, Stripe, Gmail, and analytics across 10+ tabs, Dirac visits each app, captures the important information, and presents everything in a single summary view. Your entire morning routine in 60 seconds.
+            Instead of manually opening GitHub, Stripe, Gmail, and analytics across dozens of platforms, Dirac visits each app, captures the important information, and presents everything in a single summary view. Your entire morning routine in 60 seconds.
           </p>
 
           <div className="space-y-4 pt-6">
-            <p className="font-semibold text-black dark:text-white">With Start My Day, you can:</p>
+            <p className="font-semibold text-black dark:text-white">With Dirac, you can:</p>
             <ul className="space-y-3 text-gray-700 dark:text-gray-300">
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
@@ -53,7 +64,7 @@ export default function AboutPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Complete your entire morning routine in <span className="font-semibold">60 seconds</span> instead of 10+ minutes.</span>
+                <span>Complete your entire morning routine in <span className="font-semibold">60 seconds</span> instead of 20+ minutes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
@@ -79,24 +90,24 @@ export default function AboutPage() {
           <p className="font-semibold text-black dark:text-white pt-2">With Start My Day, you can:</p>
           
           <div className="grid md:grid-cols-2 gap-4 pt-4">
-            <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
+            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">Start your day faster</span> — complete your morning routine in 60 seconds
+                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">Start your day faster</span> — complete your morning routine in 60 seconds
               </p>
             </div>
-            <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
+            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">See everything at once</span> — all your important info in one summary view
+                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">See everything at once</span> — all your important info in one summary view
               </p>
             </div>
-            <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
+            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">No more tab chaos</span> — stop opening 10+ tabs every morning
+                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">No more tab chaos</span> — stop opening 10+ tabs every morning
               </p>
             </div>
-            <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
+            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-black dark:text-white">One click</span> to check GitHub, Stripe, Gmail, and analytics
+                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">One click</span> to check GitHub, Stripe, Gmail, and analytics
               </p>
             </div>
           </div>
@@ -116,15 +127,15 @@ export default function AboutPage() {
           </h2>
           
           <div className="space-y-4">
-            <div className="p-6 border-l-4 border-black dark:border-white rounded-lg">
-              <h3 className="text-xl font-bold text-black dark:text-white mb-2">Mission</h3>
+            <div className="p-6 border-l-4 border-[#ed5b25] dark:border-[#ff6a35] rounded-lg bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
+              <h3 className="text-xl font-bold text-[#ed5b25] dark:text-[#ff6a35] mb-2">Mission</h3>
               <p className="text-gray-700 dark:text-gray-300">
                 Make morning routines effortless — one click to check everything that matters.
               </p>
             </div>
             
-            <div className="p-6 border-l-4 border-black dark:border-white rounded-lg">
-              <h3 className="text-xl font-bold text-black dark:text-white mb-2">Vision</h3>
+            <div className="p-6 border-l-4 border-[#ed5b25] dark:border-[#ff6a35] rounded-lg bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
+              <h3 className="text-xl font-bold text-[#ed5b25] dark:text-[#ff6a35] mb-2">Vision</h3>
               <p className="text-gray-700 dark:text-gray-300">
                 Become the default way people start their day — eliminating the chaos of opening multiple tabs and apps every morning.
               </p>
@@ -171,13 +182,14 @@ export default function AboutPage() {
               <Link 
                 href="/waitlist"
                 className="inline-block relative px-10 py-5 z-20 
-                bg-white dark:bg-white/10
-                text-black dark:text-white font-bold text-lg tracking-tight rounded-full
-                border-2 border-black dark:border-white/30
-                shadow-[5px_5px_0px_0px_rgba(0,0,0,0.8)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.3)]
-                hover:shadow-[7px_7px_0px_0px_rgba(0,0,0,0.9)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,255,255,0.4)]
+                bg-[#ed5b25] dark:bg-[#ff6a35]
+                text-white dark:text-white font-bold text-lg tracking-tight rounded-full
+                border-2 border-[#ed5b25] dark:border-[#ff6a35]
+                shadow-[5px_5px_0px_0px_rgba(237,91,37,0.4)] dark:shadow-[5px_5px_0px_0px_rgba(255,106,53,0.4)]
+                hover:shadow-[7px_7px_0px_0px_rgba(237,91,37,0.6)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,106,53,0.6)]
                 hover:translate-x-[-2px] hover:translate-y-[-2px]
-                active:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.7)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]
+                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d]
+                active:shadow-[2px_2px_0px_0px_rgba(237,91,37,0.3)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,106,53,0.3)]
                 active:translate-x-[2px] active:translate-y-[2px]
                 transition-all duration-200 ease-out
                 overflow-hidden

@@ -3,11 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #ed5b25;
+  --accent-hover: #d94e1f;
+  --accent-light: #ff6a35;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-light: var(--accent-light);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -181,6 +187,9 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accent: #ff6a35;
+    --accent-hover: #ff7d4d;
+    --accent-light: #ff8f66;
   }
 }
 

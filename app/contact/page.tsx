@@ -3,11 +3,21 @@ import { Navbar } from "@/components/ui/mini-navbar";
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen bg-white dark:bg-black relative overflow-hidden">
       <Navbar />
       
+      {/* Fixed Radial Accent Background */}
+      <div
+        className="fixed left-1/2 top-[calc(100%-90px)] lg:top-[calc(100%-150px)] 
+        h-[500px] w-[700px] md:h-[500px] md:w-[1100px] lg:h-[750px] lg:w-[140%] 
+        -translate-x-1/2 rounded-[100%] border-black dark:border-white bg-white dark:bg-black 
+        bg-[radial-gradient(closest-side,#fff_82%,#000000)] 
+        dark:bg-[radial-gradient(closest-side,#000_82%,#ffffff)] 
+        pointer-events-none -z-10"
+      />
+      
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto">
+      <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto relative">
         <div className="text-center space-y-6 mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-black dark:text-white tracking-tight">
             Contact Us
@@ -34,8 +44,8 @@ export default function ContactPage() {
           </h2>
           
           <div className="space-y-6">
-            <div className="p-6 border-2 border-black dark:border-white/30 rounded-xl">
-              <h3 className="text-xl font-bold text-black dark:text-white mb-3">Email</h3>
+            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
+              <h3 className="text-xl font-bold text-[#ed5b25] dark:text-[#ff6a35] mb-3">Email</h3>
               <a 
                 href="mailto:peter@dirac.app"
                 className="text-lg text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white transition-colors"
@@ -63,13 +73,14 @@ export default function ContactPage() {
               <Link 
                 href="/waitlist"
                 className="inline-block relative px-10 py-5 z-20 
-                bg-white dark:bg-white/10
-                text-black dark:text-white font-bold text-lg tracking-tight rounded-full
-                border-2 border-black dark:border-white/30
-                shadow-[5px_5px_0px_0px_rgba(0,0,0,0.8)] dark:shadow-[5px_5px_0px_0px_rgba(255,255,255,0.3)]
-                hover:shadow-[7px_7px_0px_0px_rgba(0,0,0,0.9)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,255,255,0.4)]
+                bg-[#ed5b25] dark:bg-[#ff6a35]
+                text-white font-bold text-lg tracking-tight rounded-full
+                border-2 border-[#ed5b25] dark:border-[#ff6a35]
+                shadow-[5px_5px_0px_0px_rgba(237,91,37,0.4)] dark:shadow-[5px_5px_0px_0px_rgba(255,106,53,0.4)]
+                hover:shadow-[7px_7px_0px_0px_rgba(237,91,37,0.6)] dark:hover:shadow-[7px_7px_0px_0px_rgba(255,106,53,0.6)]
                 hover:translate-x-[-2px] hover:translate-y-[-2px]
-                active:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.7)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,255,255,0.2)]
+                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d]
+                active:shadow-[2px_2px_0px_0px_rgba(237,91,37,0.3)] dark:active:shadow-[2px_2px_0px_0px_rgba(255,106,53,0.3)]
                 active:translate-x-[2px] active:translate-y-[2px]
                 transition-all duration-200 ease-out
                 overflow-hidden

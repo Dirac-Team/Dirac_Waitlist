@@ -289,8 +289,8 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
     }
 
     function createInstancedMaterial() {
-      const baseCol = new THREE.Color(0xffffff); // White base
-      const emisCol = new THREE.Color(0xffffff); // White emissive
+      const baseCol = new THREE.Color(0xed5b25); // Orange base
+      const emisCol = new THREE.Color(0xff6a35); // Orange emissive
 
       return new THREE.ShaderMaterial({
         defines: { USE_INSTANCING: "" },
