@@ -22,3 +22,22 @@ export function isValidLicenseKeyFormat(key: string): boolean {
   return /^DIRAC-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key);
 }
 
+/**
+ * Create and store a license in Firestore
+ */
+export async function createLicense(licenseKey: string, email: string) {
+  const { db } = await import("@/lib/firebase");
+  const { doc, setDoc, serverTimestamp } = await import("firebase/firestore");
+  
+  const licenseRef = doc(db, "licenses", licenseKey);
+  
+  await setDoc(licenseRef, {
+    key: licenseKey,
+    email,
+    status: "active",
+    createdAt: serverTimestamp(),
+  });
+  
+  return licenseKey;
+}
+
