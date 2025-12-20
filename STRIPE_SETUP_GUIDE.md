@@ -25,7 +25,7 @@ I've created a complete payment system with:
 2. Click **Add product**
 3. Fill in:
    - **Name**: `Dirac Pro`
-   - **Description**: `Monthly subscription for Dirac - Start your day in 60 seconds`
+   - **Description**: `Monthly subscription for Dirac - Morning context: 30 seconds, not 20 minutes`
    - **Pricing**: 
      - Type: **Recurring**
      - Price: **$15.00**

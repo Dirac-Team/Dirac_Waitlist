@@ -48,7 +48,7 @@ export default function AboutPage() {
           </p>
           
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            Instead of manually opening GitHub, Stripe, Gmail, and analytics across dozens of platforms, Dirac visits each app, captures the important information, and presents everything in a single summary view. Your entire morning routine in 60 seconds.
+            Instead of manually opening GitHub, Stripe, Gmail, and analytics across dozens of platforms, Dirac visits each app, captures the important information, and presents everything in a single summary view. Morning context: 30 seconds, not 20 minutes.
           </p>
 
           <div className="space-y-4 pt-6">
@@ -64,7 +64,7 @@ export default function AboutPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
-                <span>Complete your entire morning routine in <span className="font-semibold">60 seconds</span> instead of 20+ minutes.</span>
+                <span>Get morning context in <span className="font-semibold">30 seconds</span> instead of 20+ minutes.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-black dark:text-white font-bold mt-1">•</span>
@@ -92,7 +92,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-4 pt-4">
             <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
               <p className="text-gray-700 dark:text-gray-300">
-                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">Start your day faster</span> — complete your morning routine in 60 seconds
+                <span className="font-semibold text-[#ed5b25] dark:text-[#ff6a35]">Start your day faster</span> — get morning context in 30 seconds, not 20 minutes
               </p>
             </div>
             <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5">
@@ -157,7 +157,7 @@ export default function AboutPage() {
               Dirac was born from frustration — we were tired of wasting time every morning opening the same apps, checking the same tabs, and gathering the same information.
             </p>
             <p>
-              We're a small team of builders, designers, and productivity enthusiasts who believe your morning routine shouldn't take 10+ minutes when it can be done in 60 seconds.
+              We're a small team of builders, designers, and productivity enthusiasts who believe getting morning context shouldn't take 20+ minutes when it can be done in 30 seconds.
             </p>
             <p>
               Our goal is simple: one click to check all your morning apps and see everything that matters in a single summary view.
@@ -172,7 +172,7 @@ export default function AboutPage() {
         <section className="text-center py-20 border-t-2 border-black dark:border-white/30">
           <div className="space-y-6">
             <h2 className="text-4xl md:text-5xl font-bold text-black dark:text-white">
-              Ready to start your day in 60 seconds?
+              Ready for 30-second morning context?
             </h2>
             <p className="text-lg text-gray-700 dark:text-gray-300">
               Join the waitlist and be among the first to experience Start My Day.

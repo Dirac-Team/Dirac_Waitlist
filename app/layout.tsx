@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Dirac - Start My Day",
-  description: "Automatically check all your morning apps with one click. GitHub, Stripe, Gmail, and analytics in a single summary view. Your entire morning routine in 60 seconds.",
+  description: "Automatically check all your morning apps with one click. GitHub, Stripe, Gmail, and analytics in a single summary view. Morning context: 30 seconds, not 20 minutes.",
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <Hero
       eyebrow="MVP is Coming soon"
-      subtitle="Dirac checks all your daily apps - Discord, GitHub, Stripe, Gmail, and more, delivering everything in one brief morning summary."
+      subtitle="No more checking all your daily tabs manually. One click -> one summary with everything you need to know to start your work."
       ctaLabel="Join The Waitlist"
       ctaHref="/waitlist"
     />
