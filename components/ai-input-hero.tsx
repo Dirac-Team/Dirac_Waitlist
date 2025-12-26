@@ -820,7 +820,7 @@ export function HeroWave({ className, style, extendLeftPx = 320, title = "Build 
           className="max-w-3xl w-full text-center"
           style={{ pointerEvents: "auto" }}
         >
-          <h1 className="text-white text-3xl sm:text-5xl font-semibold tracking-tight drop-shadow-[0_1px_8px_rgba(0,112,243,0.25)]">
+          <h1 className="text-white text-4xl sm:text-6xl font-semibold tracking-tight drop-shadow-[0_1px_8px_rgba(0,112,243,0.25)]">
             {title}
           </h1>
           <p className="text-gray-300/90 mt-3 sm:mt-4 text-sm sm:text-base">

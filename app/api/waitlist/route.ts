@@ -49,9 +49,9 @@ export async function POST(request: NextRequest) {
       try {
         const emailResult = await resend.emails.send({
           from: "peter@dirac.app",
-          to: email,
+        to: email,
           subject: "You're on the Dirac Waitlist",
-          html: `
+        html: `
           <!DOCTYPE html>
           <html lang="en">
             <head>
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
                             <div style="position: relative; z-index: 1;">
                               <p style="margin: 0 0 24px 0; font-size: 18px; color: #000000; font-weight: 500;">
                                 Thank you for joining the Dirac waitlist.
-                              </p>
+                </p>
                               <p style="margin: 0 0 32px 0; font-size: 16px; color: #333333; line-height: 1.7;">
                                 We're building Start My Day — automatically check all your morning apps with one click. Instead of manually opening GitHub, Stripe, Gmail, and analytics across 10+ tabs, Dirac visits each app and presents everything in a single summary view. Morning context: 30 seconds, not 20 minutes.
                               </p>
@@ -96,13 +96,13 @@ export async function POST(request: NextRequest) {
                                   <li style="margin-bottom: 8px;">Priority access when we launch</li>
                                   <li style="margin-bottom: 8px;">Updates on our progress</li>
                                   <li>Exclusive early access opportunities</li>
-                                </ul>
-                              </div>
+                  </ul>
+                </div>
                               
                               <p style="margin: 32px 0 0 0; font-size: 15px; color: #666666; line-height: 1.6;">
                                 We'll be in touch soon.
-                              </p>
-                            </div>
+                </p>
+              </div>
                           </div>
                         </td>
                       </tr>
