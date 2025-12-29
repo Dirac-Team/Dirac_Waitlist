@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/mini-navbar";
 
 type OnboardingStep = "email" | "download" | "payment" | "policy" | "preferences" | "complete";
 
-export default function OnboardingPage() {
-  const [step, setStep] = useState<OnboardingStep>("email");
+function OnboardingContent() {
+  const searchParams = useSearchParams();
+  const stepParam = searchParams.get("step") as OnboardingStep | null;
+  const [step, setStep] = useState<OnboardingStep>(stepParam || "email");
   const [email, setEmail] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState<"intel" | "arm" | null>(null);
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
@@ -415,6 +418,18 @@ export default function OnboardingPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-[#ed5b25] dark:border-[#ff6a35] border-r-transparent"></div>
+      </div>
+    }>
+      <OnboardingContent />
+    </Suspense>
   );
 }
 

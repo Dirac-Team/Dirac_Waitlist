@@ -33,11 +33,6 @@ function OnboardingSuccessContent() {
           // Store in localStorage for the onboarding flow
           localStorage.setItem("dirac_license_key", data.licenseKey);
           localStorage.setItem("dirac_email", data.email);
-          
-          // Redirect to policy step after 2 seconds
-          setTimeout(() => {
-            router.push("/onboarding?step=policy");
-          }, 2000);
         } else {
           setError(data.error || "Failed to retrieve license key");
         }
@@ -137,9 +132,13 @@ function OnboardingSuccessContent() {
               </div>
             )}
 
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Redirecting to complete your setup...
-            </p>
+            <a
+              href="/onboarding?step=policy"
+              className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
+                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all mt-6"
+            >
+              Continue Setup
+            </a>
           </div>
         )}
       </section>

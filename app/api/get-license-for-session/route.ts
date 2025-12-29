@@ -37,16 +37,15 @@ export async function GET(request: NextRequest) {
     const db = getDb();
     const licensesRef = collection(db, "licenses");
 
-    // Check if this email already has a license from this session
+    // Check if this session already has a license (webhook should have created it)
     const existingQuery = query(
       licensesRef,
-      where("email", "==", email.toLowerCase().trim()),
       where("stripeSessionId", "==", sessionId)
     );
     const existingDocs = await getDocs(existingQuery);
 
     if (!existingDocs.empty) {
-      // Return existing license key
+      // Return existing license key created by webhook
       const existingLicense = existingDocs.docs[0].data();
       return NextResponse.json(
         { 
@@ -57,17 +56,38 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Generate a new unique license key
+    // If webhook hasn't created it yet, wait and retry a few times
+    for (let i = 0; i < 5; i++) {
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      
+      const retryQuery = query(licensesRef, where("stripeSessionId", "==", sessionId));
+      const retryDocs = await getDocs(retryQuery);
+      
+      if (!retryDocs.empty) {
+        const license = retryDocs.docs[0].data();
+        return NextResponse.json(
+          { 
+            licenseKey: license.key,
+            email: email 
+          },
+          { status: 200 }
+        );
+      }
+    }
+
+    // Webhook failed - create license as fallback
+    console.warn("Webhook did not create license, creating as fallback for session:", sessionId);
+    
     let licenseKey = generateLicenseKey();
     
-    // Ensure uniqueness (very unlikely collision, but safe)
+    // Ensure uniqueness
     let attempts = 0;
     while (attempts < 10) {
       const keyQuery = query(licensesRef, where("key", "==", licenseKey));
       const keyDocs = await getDocs(keyQuery);
       
       if (keyDocs.empty) {
-        break; // Key is unique
+        break;
       }
       
       licenseKey = generateLicenseKey();
@@ -80,12 +100,14 @@ export async function GET(request: NextRequest) {
       email: email.toLowerCase().trim(),
       status: "active",
       createdAt: new Date().toISOString(),
+      device_id: null,
+      device_registered_at: null,
       stripeSessionId: sessionId,
       stripeSubscriptionId: subscriptionId || null,
       stripeCustomerId: session.customer as string || null,
     });
 
-    console.log("License created:", {
+    console.log("License created (fallback):", {
       key: licenseKey,
       email: email,
       sessionId: sessionId,

@@ -51,9 +51,33 @@ export async function POST(request: NextRequest) {
 
         console.log("Processing checkout.session.completed for:", customerEmail);
 
-        // Generate and store license key
+        // Check if license already exists for this session (prevent duplicates)
+        const { db } = await import("@/lib/firebase");
+        const { collection, query, where, getDocs, addDoc, serverTimestamp } = await import("firebase/firestore");
+        
+        const licensesRef = collection(db, "licenses");
+        const existingQuery = query(licensesRef, where("stripeSessionId", "==", session.id));
+        const existingDocs = await getDocs(existingQuery);
+        
+        if (!existingDocs.empty) {
+          console.log("License already exists for session:", session.id);
+          break;
+        }
+
+        // Generate and store license key with Stripe metadata
         const licenseKey = generateLicenseKey();
-        await createLicense(licenseKey, customerEmail);
+        
+        await addDoc(licensesRef, {
+          key: licenseKey,
+          email: customerEmail.toLowerCase().trim(),
+          status: "active",
+          createdAt: serverTimestamp(),
+          device_id: null,
+          device_registered_at: null,
+          stripeSessionId: session.id,
+          stripeCustomerId: session.customer as string || null,
+          stripeSubscriptionId: session.subscription as string || null,
+        });
 
         console.log("License created:", {
           key: licenseKey,
