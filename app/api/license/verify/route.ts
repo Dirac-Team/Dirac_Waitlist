@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { isValidLicenseKeyFormat } from "@/lib/license";
 
 export async function POST(request: NextRequest) {
   try {
-    const { key } = await request.json();
+    const { key, device_id } = await request.json();
 
     // Validate input
     if (!key || typeof key !== "string") {
@@ -13,6 +13,16 @@ export async function POST(request: NextRequest) {
         { 
           status: "invalid",
           message: "License key is required" 
+        },
+        { status: 400 }
+      );
+    }
+
+    if (!device_id || typeof device_id !== "string") {
+      return NextResponse.json(
+        { 
+          status: "invalid",
+          message: "Device ID is required" 
         },
         { status: 400 }
       );
@@ -39,6 +49,7 @@ export async function POST(request: NextRequest) {
     const q = query(licensesRef, where("key", "==", licenseKey));
     const querySnapshot = await getDocs(q);
 
+    // 1. License not found
     if (querySnapshot.empty) {
       return NextResponse.json(
         { 
@@ -64,12 +75,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // License is valid and active
+    // 2. First use - device_id is null
+    if (!licenseData.device_id) {
+      await updateDoc(doc(db, "licenses", licenseDoc.id), {
+        device_id: device_id,
+        device_registered_at: serverTimestamp(),
+      });
+
+      return NextResponse.json(
+        { 
+          status: "active",
+          email: licenseData.email,
+          createdAt: licenseData.createdAt,
+        },
+        { status: 200 }
+      );
+    }
+
+    // 3. Device ID matches - same device
+    if (licenseData.device_id === device_id) {
+      return NextResponse.json(
+        { 
+          status: "active",
+          email: licenseData.email,
+          createdAt: licenseData.createdAt,
+        },
+        { status: 200 }
+      );
+    }
+
+    // 4. Device ID mismatch - different device
     return NextResponse.json(
       { 
-        status: "active",
-        email: licenseData.email,
-        createdAt: licenseData.createdAt,
+        status: "device_mismatch",
+        message: "Already activated on another device. Contact support to reset."
       },
       { status: 200 }
     );

@@ -67,7 +67,7 @@ export default function WaitlistPage() {
   return (
     <div className="relative overflow-hidden">
       <HeroWave
-        title="Launching in January 2026"
+        title="Join The Waitlist"
         subtitle="Get early access to Dirac — morning context in 30 seconds, not 20 minutes"
         placeholder="xxxxxxx@gmail.com"
         buttonText={isSubmitting ? "Joining..." : "Join"}

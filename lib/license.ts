@@ -36,6 +36,8 @@ export async function createLicense(licenseKey: string, email: string) {
     email,
     status: "active",
     createdAt: serverTimestamp(),
+    device_id: null,
+    device_registered_at: null,
   });
   
   return licenseKey;

@@ -28,7 +28,7 @@ I've created a complete payment system with:
    - **Description**: `Monthly subscription for Dirac - Morning context: 30 seconds, not 20 minutes`
    - **Pricing**: 
      - Type: **Recurring**
-     - Price: **$15.00**
+     - Price: **$8.99**
      - Billing period: **Monthly**
    - **Trial period**: Set to **4 days**
 4. Click **Save product**

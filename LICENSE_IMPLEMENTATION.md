@@ -101,7 +101,7 @@ STRIPE_PRICE_ID=price_xxxxxxxxxxxxx
 
 - [ ] Add `STRIPE_SECRET_KEY` to Netlify env vars
 - [ ] Add `STRIPE_PRICE_ID` to Netlify env vars
-- [ ] Create Dirac Pro product in Stripe ($15/month, 4-day trial)
+- [ ] Create Dirac Pro product in Stripe ($8.99/month, 4-day trial)
 - [ ] Set Firestore security rules (see LICENSE_SYSTEM.md)
 - [ ] Update desktop app to call `https://dirac.app/api/license/verify`
 - [ ] Test with Stripe test card

@@ -7,17 +7,20 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
+    const { email } = await request.json();
+
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
+      customer_email: email || undefined,
       line_items: [
         {
           price: process.env.STRIPE_PRICE_ID!, // Your Dirac Pro price ID
           quantity: 1,
         },
       ],
-      success_url: `https://dirac.app/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://dirac.app/payment/cancel`,
+      success_url: `https://dirac.app/onboarding/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `https://dirac.app/onboarding?step=payment`,
       subscription_data: {
         trial_period_days: 4,
       },

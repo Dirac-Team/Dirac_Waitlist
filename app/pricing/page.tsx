@@ -80,7 +80,7 @@ export default function PricingPage() {
               
               {/* Price */}
               <div className="mb-6">
-                <span className="text-5xl font-bold text-black dark:text-white">$15</span>
+                <span className="text-5xl font-bold text-black dark:text-white">$8.99</span>
                 <span className="text-xl text-gray-600 dark:text-gray-400">/month</span>
               </div>
 
