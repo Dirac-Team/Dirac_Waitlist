@@ -1,11 +1,21 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/ui/mini-navbar";
 
 export default function TermsPage() {
+  const [isEmbedded, setIsEmbedded] = useState(false);
+  
+  useEffect(() => {
+    // Check if we're in an iframe (embedded in onboarding)
+    setIsEmbedded(window.self !== window.top);
+  }, []);
+  
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <Navbar />
+      {!isEmbedded && <Navbar />}
       
-      <section className="pt-32 pb-20 px-6 md:px-8 max-w-4xl mx-auto">
+      <section className={`${isEmbedded ? 'pt-8' : 'pt-32'} pb-20 px-6 md:px-8 max-w-4xl mx-auto`}>
         <div className="prose dark:prose-invert max-w-none">
           <h1>Terms of Service</h1>
           <p><strong>Last Updated: December 29, 2025</strong></p>
