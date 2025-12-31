@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 4,
       },
-      allow_promotion_codes: true,
+      // Note: allow_promotion_codes will be set below based on whether user provided a code
     };
 
     // If promo code provided, validate and apply it
@@ -62,13 +62,11 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Apply the promo code
+        // Apply the promo code via discounts
+        // Note: Cannot use allow_promotion_codes when discounts is set
         sessionConfig.discounts = [{
           promotion_code: promoCodeObj.id,
         }];
-        
-        // Disable manual code entry at checkout since we're applying one
-        sessionConfig.allow_promotion_codes = false;
 
         console.log("Promo code applied:", {
           code: promoCode,
@@ -81,6 +79,9 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+    } else {
+      // No promo code provided - allow users to enter one at Stripe checkout
+      sessionConfig.allow_promotion_codes = true;
     }
 
     // Create Checkout Session
