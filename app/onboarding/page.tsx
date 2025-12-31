@@ -263,7 +263,7 @@ function OnboardingContent() {
                   setPromoCode(e.target.value.toUpperCase());
                   setPromoError("");
                 }}
-                placeholder="DIRAC-PH50"
+                placeholder="abcdefg-1234567"
                 className="w-full px-4 py-3 text-center border-2 border-gray-300 dark:border-gray-700 rounded-xl
                   bg-white dark:bg-black text-black dark:text-white uppercase
                   focus:border-[#ed5b25] dark:focus:border-[#ff6a35] focus:outline-none
