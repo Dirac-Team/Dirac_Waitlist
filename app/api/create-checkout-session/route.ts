@@ -70,20 +70,9 @@ export async function POST(request: NextRequest) {
         // Disable manual code entry at checkout since we're applying one
         sessionConfig.allow_promotion_codes = false;
 
-        // Get coupon ID - handle both string and expanded object
-        let couponId: string;
-        if (typeof promoCodeObj.coupon === 'string') {
-          couponId = promoCodeObj.coupon;
-        } else if (promoCodeObj.coupon && 'id' in promoCodeObj.coupon) {
-          couponId = promoCodeObj.coupon.id;
-        } else {
-          couponId = 'unknown';
-        }
-
         console.log("Promo code applied:", {
           code: promoCode,
-          id: promoCodeObj.id,
-          coupon: couponId,
+          promoId: promoCodeObj.id,
         });
       } catch (promoError: any) {
         console.error("Error validating promo code:", promoError);
