@@ -103,13 +103,48 @@ export default function TermsPage() {
             You are responsible for maintaining the confidentiality of your license key and for all activities that occur under your account.
           </p>
 
-          <h2>6. Contact Information</h2>
+          <h2>6. AI Analysis Disclaimer</h2>
+          
+          <h3>6.1 No Warranty of Accuracy</h3>
+          <p>
+            Dirac uses artificial intelligence (AI) to analyze screenshots and generate summaries of information from your applications. 
+            While we strive for accuracy, <strong>AI-generated content may contain errors, omissions, or inaccuracies</strong>.
+          </p>
+          
+          <h3>6.2 Not a Substitute for Direct Review</h3>
+          <p>
+            AI summaries are provided for convenience only and should not be relied upon as the sole source of information for critical decisions. 
+            You should verify important information by reviewing the original applications directly.
+          </p>
+          
+          <h3>6.3 Limitation of Liability for AI Errors</h3>
+          <p>
+            We make no warranties regarding the accuracy, completeness, or reliability of AI-generated summaries. 
+            <strong>You use AI-generated content at your own risk.</strong> Dirac AI shall not be liable for any decisions made, 
+            actions taken, or losses incurred based on AI-generated summaries, including but not limited to:
+          </p>
+          <ul>
+            <li>Missed notifications or alerts</li>
+            <li>Misinterpreted data or metrics</li>
+            <li>Incomplete information summaries</li>
+            <li>Errors in analyzing screenshots</li>
+            <li>Failure to capture or summarize important information</li>
+          </ul>
+          
+          <h3>6.4 Third-Party AI Services</h3>
+          <p>
+            The App relies on third-party AI services for processing. We are not responsible for the accuracy, 
+            availability, or performance of these third-party AI services.
+          </p>
+
+          <h2>7. Contact Information</h2>
           <p>For questions about these Terms, please contact us at:</p>
           <p><strong>Email:</strong> peter@dirac.app</p>
 
-          <h2>7. Acknowledgment</h2>
+          <h2>8. Acknowledgment</h2>
           <p>
-            BY USING DIRAC, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE, UNDERSTAND THEM, AND AGREE TO BE BOUND BY THEM.
+            BY USING DIRAC, YOU ACKNOWLEDGE THAT YOU HAVE READ THESE TERMS OF SERVICE, UNDERSTAND THEM, AND AGREE TO BE BOUND BY THEM. 
+            You specifically acknowledge and accept that AI-generated summaries may contain errors and should not be solely relied upon for critical decisions.
           </p>
         </div>
       </section>
