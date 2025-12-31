@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const promoCodeObj = promoCodes.data[0];
+        const promoCodeObj = promoCodes.data[0] as Stripe.PromotionCode;
 
         // Check if code is still valid (not expired, within redemption limits)
         if (promoCodeObj.restrictions?.first_time_transaction && email) {
@@ -70,10 +70,15 @@ export async function POST(request: NextRequest) {
         // Disable manual code entry at checkout since we're applying one
         sessionConfig.allow_promotion_codes = false;
 
-        // Get coupon ID (can be string or object)
-        const couponId = typeof promoCodeObj.coupon === 'string' 
-          ? promoCodeObj.coupon 
-          : promoCodeObj.coupon.id;
+        // Get coupon ID - handle both string and expanded object
+        let couponId: string;
+        if (typeof promoCodeObj.coupon === 'string') {
+          couponId = promoCodeObj.coupon;
+        } else if (promoCodeObj.coupon && 'id' in promoCodeObj.coupon) {
+          couponId = promoCodeObj.coupon.id;
+        } else {
+          couponId = 'unknown';
+        }
 
         console.log("Promo code applied:", {
           code: promoCode,
