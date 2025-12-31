@@ -7,15 +7,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email } = await request.json();
+    const { email, promoCode } = await request.json();
 
-    // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    // Prepare session configuration
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       customer_email: email || undefined,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID!, // Your Dirac Pro price ID
+          price: process.env.STRIPE_PRICE_ID!,
           quantity: 1,
         },
       ],
@@ -24,8 +24,68 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 4,
       },
-      allow_promotion_codes: true, // Optional: allow discount codes
-    });
+      allow_promotion_codes: true,
+    };
+
+    // If promo code provided, validate and apply it
+    if (promoCode && promoCode.trim()) {
+      try {
+        // Find the promotion code in Stripe
+        const promoCodes = await stripe.promotionCodes.list({
+          code: promoCode.trim().toUpperCase(),
+          active: true,
+          limit: 1,
+        });
+
+        if (promoCodes.data.length === 0) {
+          return NextResponse.json(
+            { error: "Invalid promo code. Please check and try again." },
+            { status: 400 }
+          );
+        }
+
+        const promoCodeObj = promoCodes.data[0];
+
+        // Check if code is still valid (not expired, within redemption limits)
+        if (promoCodeObj.restrictions?.first_time_transaction && email) {
+          // Check if customer already used a promo code
+          const existingCustomers = await stripe.customers.list({
+            email: email,
+            limit: 1,
+          });
+          
+          if (existingCustomers.data.length > 0) {
+            return NextResponse.json(
+              { error: "This promo code is only valid for new customers." },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Apply the promo code
+        sessionConfig.discounts = [{
+          promotion_code: promoCodeObj.id,
+        }];
+        
+        // Disable manual code entry at checkout since we're applying one
+        sessionConfig.allow_promotion_codes = false;
+
+        console.log("Promo code applied:", {
+          code: promoCode,
+          id: promoCodeObj.id,
+          coupon: promoCodeObj.coupon.id,
+        });
+      } catch (promoError: any) {
+        console.error("Error validating promo code:", promoError);
+        return NextResponse.json(
+          { error: "Unable to validate promo code. Please try again." },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Create Checkout Session
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({ url: session.url }, { status: 200 });
   } catch (error: any) {

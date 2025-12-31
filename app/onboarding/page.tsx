@@ -9,9 +9,13 @@ type OnboardingStep = "email" | "download" | "payment" | "policy" | "preferences
 function OnboardingContent() {
   const searchParams = useSearchParams();
   const stepParam = searchParams.get("step") as OnboardingStep | null;
+  const promoParam = searchParams.get("promo");
+  
   const [step, setStep] = useState<OnboardingStep>(stepParam || "email");
   const [email, setEmail] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState<"intel" | "arm" | null>(null);
+  const [promoCode, setPromoCode] = useState(promoParam || "");
+  const [promoError, setPromoError] = useState("");
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [bestApps, setBestApps] = useState<string[]>([]);
   const [referralSource, setReferralSource] = useState("");
@@ -54,18 +58,27 @@ function OnboardingContent() {
   };
 
   const handlePayment = async () => {
+    setPromoError("");
+    
     try {
       const response = await fetch("/api/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ 
+          email,
+          promoCode: promoCode.trim().toUpperCase() || undefined
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.error?.includes("promo") || data.error?.includes("code")) {
+          setPromoError(data.error);
+          return;
+        }
         throw new Error(data.error || "Failed to create checkout session");
       }
 
@@ -235,6 +248,37 @@ function OnboardingContent() {
               <div className="mt-4 text-sm text-[#ed5b25] dark:text-[#ff6a35] font-semibold">
                 4-Day Free Trial • Cancel Anytime
               </div>
+            </div>
+
+            {/* Promo Code Input */}
+            <div className="max-w-md mx-auto">
+              <label htmlFor="promo" className="block text-left text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Have a promo code? 🎁
+              </label>
+              <input
+                id="promo"
+                type="text"
+                value={promoCode}
+                onChange={(e) => {
+                  setPromoCode(e.target.value.toUpperCase());
+                  setPromoError("");
+                }}
+                placeholder="DIRAC-PH50"
+                className="w-full px-4 py-3 text-center border-2 border-gray-300 dark:border-gray-700 rounded-xl
+                  bg-white dark:bg-black text-black dark:text-white uppercase
+                  focus:border-[#ed5b25] dark:focus:border-[#ff6a35] focus:outline-none
+                  placeholder:text-gray-400 placeholder:normal-case"
+              />
+              {promoError && (
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+                  {promoError}
+                </p>
+              )}
+              {promoCode && !promoError && (
+                <p className="mt-2 text-sm text-green-600 dark:text-green-400">
+                  ✓ Code will be applied at checkout
+                </p>
+              )}
             </div>
 
             <button
