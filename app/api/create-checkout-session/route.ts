@@ -24,10 +24,6 @@ export async function POST(request: NextRequest) {
       subscription_data: {
         trial_period_days: 4,
       },
-      // Enable customer portal for subscription management
-      customer_update: {
-        address: "auto",
-      },
       // Note: allow_promotion_codes will be set below based on whether user provided a code
     };
 
