@@ -18,9 +18,11 @@ function OnboardingContent() {
   const [promoError, setPromoError] = useState("");
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [bestApps, setBestApps] = useState<string[]>([]);
+  const [otherApp, setOtherApp] = useState(""); // For custom app input
   const [referralSource, setReferralSource] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const appOptions = [
     "GitHub",
@@ -103,15 +105,26 @@ function OnboardingContent() {
   };
 
   const handleComplete = async () => {
+    // Compile final app list (including "other" if specified)
+    const finalApps = otherApp.trim() 
+      ? [...bestApps, `Other: ${otherApp.trim()}`] 
+      : bestApps;
+    
     // Save preferences to database if needed
     console.log({
       email,
       platform: selectedPlatform,
-      bestApps,
+      bestApps: finalApps,
       referralSource
     });
     
     setStep("complete");
+  };
+
+  const handleDownloadClick = () => {
+    // Trigger confetti
+    setShowConfetti(true);
+    setTimeout(() => setShowConfetti(false), 3000);
   };
 
   return (
@@ -370,6 +383,23 @@ function OnboardingContent() {
                   </button>
                 ))}
               </div>
+              
+              {/* Other App Input */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Other app not listed?
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g., Jira, Trello, Asana..."
+                  value={otherApp}
+                  onChange={(e) => setOtherApp(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-700 rounded-xl
+                    bg-white dark:bg-black text-black dark:text-white
+                    focus:outline-none focus:border-[#ed5b25] dark:focus:border-[#ff6a35]
+                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                />
+              </div>
             </div>
 
             {/* Referral Source */}
@@ -415,6 +445,34 @@ function OnboardingContent() {
         {/* Step 6: Complete */}
         {step === "complete" && (
           <div className="space-y-6 text-center animate-fade-in">
+            {/* Confetti Animation */}
+            {showConfetti && (
+              <div className="fixed inset-0 pointer-events-none z-50">
+                {Array.from({ length: 50 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute animate-confetti"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: '-10px',
+                      animationDelay: `${Math.random() * 0.5}s`,
+                      animationDuration: `${2 + Math.random() * 1}s`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '10px',
+                        height: '10px',
+                        backgroundColor: ['#ed5b25', '#ff6a35', '#ffaa00', '#fff'][Math.floor(Math.random() * 4)],
+                        borderRadius: Math.random() > 0.5 ? '50%' : '0%',
+                        transform: `rotate(${Math.random() * 360}deg)`,
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="inline-block p-4 bg-[#ed5b25]/10 dark:bg-[#ff6a35]/10 rounded-full mb-4">
               <svg className="w-16 h-16 text-[#ed5b25] dark:text-[#ff6a35]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -448,6 +506,7 @@ function OnboardingContent() {
 
             <a
               href={selectedPlatform === "intel" ? "/downloads/dirac-intel.dmg" : "/downloads/dirac-arm.dmg"}
+              onClick={handleDownloadClick}
               className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
                 hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
               download
