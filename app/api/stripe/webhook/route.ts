@@ -88,6 +88,18 @@ export async function POST(request: NextRequest) {
           sessionId: session.id,
         });
 
+        // Generate Stripe Customer Portal link
+        let portalUrl = "#";
+        try {
+          const portalSession = await stripe.billingPortal.sessions.create({
+            customer: session.customer as string,
+            return_url: "https://dirac.app",
+          });
+          portalUrl = portalSession.url;
+        } catch (portalError) {
+          console.error("Error creating portal session:", portalError);
+        }
+
         // Send welcome email with license key
         try {
           await resend.emails.send({
@@ -151,13 +163,26 @@ export async function POST(request: NextRequest) {
                                 </ol>
                               </div>
                               
+                              <!-- Manage Subscription Box -->
+                              <div style="background-color: #f5f5f5; padding: 24px; margin: 32px 0; border: 2px solid #e0e0e0; text-align: center;">
+                                <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600; color: #000000;">
+                                  Manage Your Subscription
+                                </p>
+                                <p style="margin: 0 0 16px 0; font-size: 14px; color: #666666;">
+                                  Cancel anytime, update payment method, or view invoices
+                                </p>
+                                <a href="${portalUrl}" style="display: inline-block; background-color: #ed5b25; color: #ffffff; padding: 12px 28px; text-decoration: none; font-weight: 600; border-radius: 6px; font-size: 15px;">
+                                  Manage Subscription
+                                </a>
+                              </div>
+                              
                               <!-- Trial Info -->
-                              <div style="background-color: #f5f5f5; padding: 20px; margin: 32px 0; border-left: 4px solid #ed5b25;">
+                              <div style="background-color: #fff8f5; padding: 20px; margin: 32px 0; border-left: 4px solid #ed5b25;">
                                 <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: 600; color: #000000;">
                                   Trial Details
                                 </p>
                                 <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.6;">
-                                  Your 4-day free trial started today. After the trial, you'll be charged $8.99/month. Cancel anytime from your Stripe customer portal.
+                                  Your 4-day free trial started today. After the trial, you'll be charged $8.99/month. Cancel anytime from the link above.
                                 </p>
                               </div>
                               
