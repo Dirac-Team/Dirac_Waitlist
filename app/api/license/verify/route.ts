@@ -5,7 +5,7 @@ import { isValidLicenseKeyFormat } from "@/lib/license";
 
 export async function POST(request: NextRequest) {
   try {
-    const { key, device_id } = await request.json();
+    const { key, deviceId, platform, appVersion } = await request.json();
 
     // Validate input
     if (!key || typeof key !== "string") {
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!device_id || typeof device_id !== "string") {
+    if (!deviceId || typeof deviceId !== "string") {
       return NextResponse.json(
         { 
           status: "invalid",
@@ -49,7 +49,6 @@ export async function POST(request: NextRequest) {
     const q = query(licensesRef, where("key", "==", licenseKey));
     const querySnapshot = await getDocs(q);
 
-    // 1. License not found
     if (querySnapshot.empty) {
       return NextResponse.json(
         { 
@@ -75,43 +74,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. First use - device_id is null
-    if (!licenseData.device_id) {
+    // --- Device Binding Logic ---
+    if (!licenseData.boundDeviceId) {
+      // First activation: Store deviceId with license
       await updateDoc(doc(db, "licenses", licenseDoc.id), {
-        device_id: device_id,
-        device_registered_at: serverTimestamp(),
+        boundDeviceId: deviceId,
+        deviceBoundAt: serverTimestamp(),
+        platform: platform || null,
+        appVersion: appVersion || null,
       });
-
+      
+      console.log(`License ${licenseKey} activated on new device: ${deviceId}`);
+      
       return NextResponse.json(
         { 
           status: "active",
           email: licenseData.email,
-          createdAt: licenseData.createdAt,
         },
         { status: 200 }
       );
-    }
-
-    // 3. Device ID matches - same device
-    if (licenseData.device_id === device_id) {
+    } else if (licenseData.boundDeviceId === deviceId) {
+      // Returning user: Verify deviceId matches
+      
+      // Update app version if provided (for analytics/support)
+      if (appVersion && appVersion !== licenseData.appVersion) {
+        await updateDoc(doc(db, "licenses", licenseDoc.id), {
+          appVersion: appVersion,
+        });
+      }
+      
       return NextResponse.json(
         { 
           status: "active",
           email: licenseData.email,
-          createdAt: licenseData.createdAt,
         },
         { status: 200 }
       );
+    } else {
+      // Mismatch: Return 403
+      console.warn(`License ${licenseKey} activation blocked - device mismatch. Expected: ${licenseData.boundDeviceId}, Got: ${deviceId}`);
+      
+      return NextResponse.json(
+        { 
+          status: "invalid",
+          message: "License already activated on another device" 
+        },
+        { status: 403 }
+      );
     }
-
-    // 4. Device ID mismatch - different device
-    return NextResponse.json(
-      { 
-        status: "device_mismatch",
-        message: "Already activated on another device. Contact support to reset."
-      },
-      { status: 200 }
-    );
+    // --- End Device Binding Logic ---
 
   } catch (error: any) {
     console.error("Error verifying license:", error);
@@ -136,4 +147,3 @@ export async function OPTIONS(request: NextRequest) {
     },
   });
 }
-
