@@ -505,16 +505,11 @@ function OnboardingContent() {
             </div>
 
             <a
-              href={
-                selectedPlatform === "intel"
-                  ? "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg"
-                  : "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg"
-              }
+              href={selectedPlatform === "intel" ? "/downloads/dirac-intel.dmg" : "/downloads/dirac-arm.dmg"}
               onClick={handleDownloadClick}
               className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
                 hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
-              target="_blank"
-              rel="noopener noreferrer"
+              download
             >
               Download Dirac
             </a>
