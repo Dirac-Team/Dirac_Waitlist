@@ -5,7 +5,8 @@ import { isValidLicenseKeyFormat } from "@/lib/license";
 
 export async function POST(request: NextRequest) {
   try {
-    const { key, deviceId, platform, appVersion } = await request.json();
+    const { key, deviceId, device_id, platform, appVersion } = await request.json();
+    const resolvedDeviceId = (deviceId ?? device_id) as unknown;
 
     // Validate input
     if (!key || typeof key !== "string") {
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!deviceId || typeof deviceId !== "string") {
+    if (!resolvedDeviceId || typeof resolvedDeviceId !== "string") {
       return NextResponse.json(
         { 
           status: "invalid",
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const licenseKey = key.trim().toUpperCase();
+    const normalizedDeviceId = resolvedDeviceId.trim();
 
     // Validate format
     if (!isValidLicenseKeyFormat(licenseKey)) {
@@ -63,28 +65,56 @@ export async function POST(request: NextRequest) {
     const licenseDoc = querySnapshot.docs[0];
     const licenseData = licenseDoc.data();
 
-    // Check status
-    if (licenseData.status !== "active") {
-      return NextResponse.json(
-        { 
-          status: "inactive",
-          message: "License key is not active" 
-        },
-        { status: 200 }
-      );
+    // Check status (active OR trial that hasn't expired)
+    const status = licenseData.status;
+    if (status !== "active") {
+      if (status === "trial") {
+        const rawTrialEndsAt = licenseData.trialEndsAt;
+        let trialEndsAt: Date | null = null;
+
+        // Firestore Timestamp has toDate()
+        if (rawTrialEndsAt?.toDate && typeof rawTrialEndsAt.toDate === "function") {
+          trialEndsAt = rawTrialEndsAt.toDate();
+        } else if (rawTrialEndsAt instanceof Date) {
+          trialEndsAt = rawTrialEndsAt;
+        } else if (typeof rawTrialEndsAt === "string") {
+          const parsed = new Date(rawTrialEndsAt);
+          trialEndsAt = Number.isNaN(parsed.getTime()) ? null : parsed;
+        }
+
+        if (trialEndsAt && new Date() <= trialEndsAt) {
+          // Valid trial → allow activation/verification
+        } else {
+          return NextResponse.json(
+            {
+              status: "inactive",
+              message: "Trial expired",
+            },
+            { status: 200 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            status: "inactive",
+            message: "License key is not active",
+          },
+          { status: 200 }
+        );
+      }
     }
 
     // --- Device Binding Logic ---
     if (!licenseData.boundDeviceId) {
       // First activation: Store deviceId with license
       await updateDoc(doc(db, "licenses", licenseDoc.id), {
-        boundDeviceId: deviceId,
+        boundDeviceId: normalizedDeviceId,
         deviceBoundAt: serverTimestamp(),
         platform: platform || null,
         appVersion: appVersion || null,
       });
       
-      console.log(`License ${licenseKey} activated on new device: ${deviceId}`);
+      console.log(`License ${licenseKey} activated on new device: ${normalizedDeviceId}`);
       
       return NextResponse.json(
         { 
@@ -93,7 +123,7 @@ export async function POST(request: NextRequest) {
         },
         { status: 200 }
       );
-    } else if (licenseData.boundDeviceId === deviceId) {
+    } else if (licenseData.boundDeviceId === normalizedDeviceId) {
       // Returning user: Verify deviceId matches
       
       // Update app version if provided (for analytics/support)
@@ -112,7 +142,7 @@ export async function POST(request: NextRequest) {
       );
     } else {
       // Mismatch: Return 403
-      console.warn(`License ${licenseKey} activation blocked - device mismatch. Expected: ${licenseData.boundDeviceId}, Got: ${deviceId}`);
+      console.warn(`License ${licenseKey} activation blocked - device mismatch. Expected: ${licenseData.boundDeviceId}, Got: ${normalizedDeviceId}`);
       
       return NextResponse.json(
         { 

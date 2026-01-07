@@ -1,28 +1,33 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/mini-navbar";
 
-type OnboardingStep = "email" | "download" | "payment" | "policy" | "preferences" | "complete";
+type OnboardingStep = "email" | "download" | "policy" | "preferences" | "complete";
+
+const DOWNLOAD_URLS = {
+  intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
+  arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
+} as const;
 
 function OnboardingContent() {
   const searchParams = useSearchParams();
   const stepParam = searchParams.get("step") as OnboardingStep | null;
-  const promoParam = searchParams.get("promo");
   
   const [step, setStep] = useState<OnboardingStep>(stepParam || "email");
   const [email, setEmail] = useState("");
   const [selectedPlatform, setSelectedPlatform] = useState<"intel" | "arm" | null>(null);
-  const [promoCode, setPromoCode] = useState(promoParam || "");
-  const [promoError, setPromoError] = useState("");
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
   const [bestApps, setBestApps] = useState<string[]>([]);
   const [otherApp, setOtherApp] = useState(""); // For custom app input
   const [referralSource, setReferralSource] = useState("");
-  const [sessionId, setSessionId] = useState<string | null>(null);
   const [licenseKey, setLicenseKey] = useState<string | null>(null);
+  const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
+  const [isCreatingLicense, setIsCreatingLicense] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const appOptions = [
     "GitHub",
@@ -56,40 +61,7 @@ function OnboardingContent() {
 
   const handleDownloadSelect = (platform: "intel" | "arm") => {
     setSelectedPlatform(platform);
-    setStep("payment");
-  };
-
-  const handlePayment = async () => {
-    setPromoError("");
-    
-    try {
-      const response = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ 
-          email,
-          promoCode: promoCode.trim().toUpperCase() || undefined
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (data.error?.includes("promo") || data.error?.includes("code")) {
-          setPromoError(data.error);
-          return;
-        }
-        throw new Error(data.error || "Failed to create checkout session");
-      }
-
-      // Redirect to Stripe Checkout
-      window.location.href = data.url;
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to start checkout. Please try again.");
-    }
+    setStep("policy");
   };
 
   const handlePolicyAccept = () => {
@@ -109,16 +81,54 @@ function OnboardingContent() {
     const finalApps = otherApp.trim() 
       ? [...bestApps, `Other: ${otherApp.trim()}`] 
       : bestApps;
-    
-    // Save preferences to database if needed
-    console.log({
-      email,
-      platform: selectedPlatform,
-      bestApps: finalApps,
-      referralSource
-    });
-    
-    setStep("complete");
+
+    if (!selectedPlatform) {
+      setCreateError("Please select your Mac chip type first.");
+      setStep("download");
+      return;
+    }
+
+    setIsCreatingLicense(true);
+    setCreateError(null);
+
+    try {
+      const response = await fetch("/api/trial/create-license", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          platform: selectedPlatform,
+          preferences: {
+            apps: finalApps,
+            referralSource,
+          },
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Failed to create your trial license. Please try again.");
+      }
+
+      if (!data?.licenseKey) {
+        throw new Error("No license key returned. Please try again.");
+      }
+
+      setLicenseKey(data.licenseKey);
+      setTrialEndsAt(data.trialEndsAt ?? null);
+
+      // Store for convenience
+      localStorage.setItem("dirac_license_key", data.licenseKey);
+      localStorage.setItem("dirac_email", data.email ?? email);
+
+      setStep("complete");
+    } catch (err: any) {
+      console.error("Error creating trial license:", err);
+      setCreateError(err?.message || "Failed to create your trial license. Please try again.");
+    } finally {
+      setIsCreatingLicense(false);
+    }
   };
 
   const handleDownloadClick = () => {
@@ -126,6 +136,20 @@ function OnboardingContent() {
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
+
+  const copyToClipboard = () => {
+    if (!licenseKey) return;
+    navigator.clipboard.writeText(licenseKey);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const downloadUrl =
+    selectedPlatform === "intel"
+      ? DOWNLOAD_URLS.intel
+      : selectedPlatform === "arm"
+        ? DOWNLOAD_URLS.arm
+        : null;
 
   return (
     <div className="min-h-screen bg-white dark:bg-black relative overflow-hidden">
@@ -145,13 +169,13 @@ function OnboardingContent() {
         {/* Progress Indicator */}
         <div className="mb-12">
           <div className="flex justify-center gap-2">
-            {["email", "download", "payment", "policy", "preferences"].map((s, i) => (
+            {["email", "download", "policy", "preferences"].map((s, i) => (
               <div
                 key={s}
                 className={`h-2 w-12 rounded-full transition-all ${
                   step === s
                     ? "bg-[#ed5b25] dark:bg-[#ff6a35]"
-                    : i < ["email", "download", "payment", "policy", "preferences"].indexOf(step)
+                    : i < ["email", "download", "policy", "preferences"].indexOf(step)
                     ? "bg-[#ed5b25]/50 dark:bg-[#ff6a35]/50"
                     : "bg-gray-300 dark:bg-gray-700"
                 }`}
@@ -196,10 +220,10 @@ function OnboardingContent() {
         {step === "download" && (
           <div className="space-y-6 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4 text-center">
-              Choose Your Download
+              Select Your Mac Chip
             </h1>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-8 text-center">
-              Select your Mac processor type
+              This ensures you download the right build
             </p>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -245,73 +269,7 @@ function OnboardingContent() {
           </div>
         )}
 
-        {/* Step 3: Payment */}
-        {step === "payment" && (
-          <div className="space-y-6 text-center animate-fade-in">
-            <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4">
-              Start Your Free Trial
-            </h1>
-            <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
-              Try Dirac free for 4 days, then $8.99/month
-            </p>
-
-            <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5 mb-8">
-              <div className="text-5xl font-bold text-black dark:text-white mb-2">$8.99</div>
-              <div className="text-gray-600 dark:text-gray-400">per month after trial</div>
-              <div className="mt-4 text-sm text-[#ed5b25] dark:text-[#ff6a35] font-semibold">
-                4-Day Free Trial • Cancel Anytime
-              </div>
-            </div>
-
-            {/* Promo Code Input */}
-            <div className="max-w-md mx-auto">
-              <label htmlFor="promo" className="block text-left text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Have a promo code? 🎁
-              </label>
-              <input
-                id="promo"
-                type="text"
-                value={promoCode}
-                onChange={(e) => {
-                  setPromoCode(e.target.value.toUpperCase());
-                  setPromoError("");
-                }}
-                placeholder="abcdefg-1234567"
-                className="w-full px-4 py-3 text-center border-2 border-gray-300 dark:border-gray-700 rounded-xl
-                  bg-white dark:bg-black text-black dark:text-white uppercase
-                  focus:border-[#ed5b25] dark:focus:border-[#ff6a35] focus:outline-none
-                  placeholder:text-gray-400 placeholder:normal-case"
-              />
-              {promoError && (
-                <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                  {promoError}
-                </p>
-              )}
-              {promoCode && !promoError && (
-                <p className="mt-2 text-sm text-green-600 dark:text-green-400">
-                  ✓ Code will be applied at checkout
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={handlePayment}
-              className="w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
-                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
-            >
-              Continue to Payment
-            </button>
-
-            <button
-              onClick={() => setStep("download")}
-              className="w-full px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-            >
-              ← Back
-            </button>
-          </div>
-        )}
-
-        {/* Step 4: Privacy Policy (shown after payment success redirect) */}
+        {/* Step 3: Privacy Policy */}
         {step === "policy" && (
           <div className="space-y-6 animate-fade-in">
             <h1 className="text-4xl md:text-5xl font-bold text-black dark:text-white mb-4 text-center">
@@ -339,6 +297,24 @@ function OnboardingContent() {
               </span>
             </label>
 
+            {/* Download buttons (requested: on /onboarding?step=policy) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <a
+                href={DOWNLOAD_URLS.arm}
+                className="inline-block w-full px-6 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-xl
+                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all text-center"
+              >
+                Download (Apple Silicon)
+              </a>
+              <a
+                href={DOWNLOAD_URLS.intel}
+                className="inline-block w-full px-6 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-xl
+                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all text-center"
+              >
+                Download (Intel)
+              </a>
+            </div>
+
             <button
               onClick={handlePolicyAccept}
               disabled={!acceptedPolicy}
@@ -348,10 +324,17 @@ function OnboardingContent() {
             >
               Continue
             </button>
+
+            <button
+              onClick={() => setStep("download")}
+              className="w-full px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
+            >
+              ← Back
+            </button>
           </div>
         )}
 
-        {/* Step 5: Preferences */}
+        {/* Step 4: Preferences */}
         {step === "preferences" && (
           <div className="space-y-8 animate-fade-in">
             <div>
@@ -425,13 +408,19 @@ function OnboardingContent() {
 
             <button
               onClick={handleComplete}
-              disabled={bestApps.length === 0 || !referralSource}
+              disabled={bestApps.length === 0 || !referralSource || isCreatingLicense}
               className="w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
                 hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all
                 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Complete Setup
+              {isCreatingLicense ? "Creating your trial..." : "Complete Setup"}
             </button>
+
+            {createError && (
+              <div className="p-4 bg-red-100 dark:bg-red-900/30 border-2 border-red-500 rounded-xl text-red-700 dark:text-red-300 text-sm">
+                {createError}
+              </div>
+            )}
 
             <button
               onClick={() => setStep("policy")}
@@ -442,7 +431,7 @@ function OnboardingContent() {
           </div>
         )}
 
-        {/* Step 6: Complete */}
+        {/* Step 5: Complete */}
         {step === "complete" && (
           <div className="space-y-6 text-center animate-fade-in">
             {/* Confetti Animation */}
@@ -483,8 +472,32 @@ function OnboardingContent() {
               You're All Set!
             </h1>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
-              Download Dirac and start your 4-day free trial
+              Download Dirac and start your free trial
             </p>
+
+            {licenseKey && (
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-black dark:text-white mb-3">
+                  Your License Key
+                </h2>
+                <div className="relative p-6 bg-gray-100 dark:bg-gray-900 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl">
+                  <code className="text-2xl font-mono text-black dark:text-white block mb-4">
+                    {licenseKey}
+                  </code>
+                  <button
+                    onClick={copyToClipboard}
+                    className="px-6 py-3 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-full hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
+                  >
+                    {copied ? "Copied!" : "Copy License Key"}
+                  </button>
+                  {trialEndsAt && (
+                    <p className="text-sm text-gray-500 mt-4">
+                      Trial ends: {new Date(trialEndsAt).toLocaleString()}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="p-6 border-2 border-[#ed5b25] dark:border-[#ff6a35] rounded-xl bg-[#ed5b25]/5 dark:bg-[#ff6a35]/5 mb-8 text-left">
               <h3 className="font-bold text-black dark:text-white mb-4">Next Steps:</h3>
@@ -504,19 +517,30 @@ function OnboardingContent() {
               </ol>
             </div>
 
-            <a
-              href={selectedPlatform === "intel" ? "/downloads/dirac-intel.dmg" : "/downloads/dirac-arm.dmg"}
-              onClick={handleDownloadClick}
-              className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
-                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
-              download
-            >
-              Download Dirac
-            </a>
+            {downloadUrl && (
+              <a
+                href={downloadUrl}
+                onClick={handleDownloadClick}
+                className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
+                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
+              >
+                Download Dirac
+              </a>
+            )}
 
-            <p className="text-sm text-gray-500">
-              Check your email ({email}) for your license key
-            </p>
+            <div className="text-sm text-gray-500 space-y-1">
+              <p>We emailed a copy of your license key and download links to {email}.</p>
+              <p>
+                Need the other build?{" "}
+                <a className="underline" href={DOWNLOAD_URLS.intel}>
+                  Intel
+                </a>{" "}
+                /{" "}
+                <a className="underline" href={DOWNLOAD_URLS.arm}>
+                  Apple Silicon
+                </a>
+              </p>
+            </div>
           </div>
         )}
       </section>

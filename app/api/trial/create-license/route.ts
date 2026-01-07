@@ -5,6 +5,10 @@ import { generateLicenseKey } from "@/lib/license";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const DOWNLOAD_URLS = {
+  intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
+  arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
+} as const;
 
 export async function POST(request: NextRequest) {
   try {
@@ -99,6 +103,9 @@ export async function POST(request: NextRequest) {
 
     // Send welcome email with license key
     try {
+      const primaryDownloadUrl =
+        platform === "intel" ? DOWNLOAD_URLS.intel : platform === "arm" ? DOWNLOAD_URLS.arm : null;
+
       await resend.emails.send({
         from: "peter@dirac.app",
         to: normalizedEmail,
@@ -153,11 +160,29 @@ export async function POST(request: NextRequest) {
                                 Setup Instructions
                               </p>
                               <ol style="margin: 0; padding-left: 20px; color: #ededed; font-size: 15px; line-height: 1.8;">
-                                <li style="margin-bottom: 12px;"><strong>Download Dirac</strong> from <a href="https://dirac.app/onboarding?step=download" style="color: #ff6a35;">dirac.app/onboarding</a></li>
-                                <li style="margin-bottom: 12px;"><strong>Open the app</strong> and enter your license key when prompted</li>
-                                <li style="margin-bottom: 12px;"><strong>Configure your apps</strong> - Add Discord, GitHub, Stripe, Gmail, etc.</li>
+                                <li style="margin-bottom: 12px;"><strong>Download Dirac</strong> ${
+                                  primaryDownloadUrl
+                                    ? `for your Mac here: <a href="${primaryDownloadUrl}" style="color: #ff6a35;">Download</a>`
+                                    : `using one of the links below`
+                                }</li>
+                                <li style="margin-bottom: 12px;"><strong>Install</strong>: Open the DMG and drag Dirac to Applications</li>
+                                <li style="margin-bottom: 12px;"><strong>Open the app</strong> and paste your license key</li>
+                                <li style="margin-bottom: 12px;"><strong>Configure your apps</strong> (GitHub, Gmail, Stripe, Discord, etc.)</li>
                                 <li><strong>Start your day</strong> - Click one button to check everything in 30 seconds!</li>
                               </ol>
+                            </div>
+
+                            <!-- Downloads (backup) -->
+                            <div style="border: 2px solid #333; padding: 20px; margin: 24px 0; background-color: #111; text-align: center;">
+                              <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #ededed; text-transform: uppercase; letter-spacing: 0.05em;">
+                                Download Links (Backup)
+                              </p>
+                              <p style="margin: 0 0 10px 0; font-size: 14px; color: #999;">
+                                Apple Silicon (M1/M2/M3/M4): <a href="${DOWNLOAD_URLS.arm}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                              </p>
+                              <p style="margin: 0; font-size: 14px; color: #999;">
+                                Intel Mac: <a href="${DOWNLOAD_URLS.intel}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                              </p>
                             </div>
                             
                             <!-- Trial Info -->
@@ -166,7 +191,7 @@ export async function POST(request: NextRequest) {
                                 Trial Details
                               </p>
                               <p style="margin: 0; font-size: 14px; color: #999; line-height: 1.6;">
-                                Your 4-day free trial started today. No payment required right now! We'll send you a reminder on day 3 if you'd like to continue using Dirac for $8.99/month.
+                                Your 4-day free trial started today. No payment required right now. If you want to keep using Dirac after the trial, you can upgrade any time.
                               </p>
                             </div>
                             
