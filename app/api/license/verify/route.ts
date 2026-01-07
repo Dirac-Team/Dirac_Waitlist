@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebase";
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 import { isValidLicenseKeyFormat } from "@/lib/license";
 
 export async function POST(request: NextRequest) {
@@ -44,12 +44,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Get Firestore instance
-    const db = getDb();
-    const licensesRef = collection(db, "licenses");
+    const db = getAdminDb();
+    const licensesRef = db.collection("licenses");
 
     // Query for the license key
-    const q = query(licensesRef, where("key", "==", licenseKey));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await licensesRef.where("key", "==", licenseKey).get();
 
     if (querySnapshot.empty) {
       return NextResponse.json(
@@ -63,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     // Get license data
     const licenseDoc = querySnapshot.docs[0];
-    const licenseData = licenseDoc.data();
+    const licenseData = licenseDoc.data() as any;
 
     // Check status (active OR trial that hasn't expired)
     const status = licenseData.status;
@@ -107,9 +106,9 @@ export async function POST(request: NextRequest) {
     // --- Device Binding Logic ---
     if (!licenseData.boundDeviceId) {
       // First activation: Store deviceId with license
-      await updateDoc(doc(db, "licenses", licenseDoc.id), {
+      await licenseDoc.ref.update({
         boundDeviceId: normalizedDeviceId,
-        deviceBoundAt: serverTimestamp(),
+        deviceBoundAt: FieldValue.serverTimestamp(),
         platform: platform || null,
         appVersion: appVersion || null,
       });
@@ -128,7 +127,7 @@ export async function POST(request: NextRequest) {
       
       // Update app version if provided (for analytics/support)
       if (appVersion && appVersion !== licenseData.appVersion) {
-        await updateDoc(doc(db, "licenses", licenseDoc.id), {
+        await licenseDoc.ref.update({
           appVersion: appVersion,
         });
       }

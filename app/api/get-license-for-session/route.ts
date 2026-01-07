@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getDb } from "@/lib/firebase";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 import { generateLicenseKey } from "@/lib/license";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -34,15 +33,11 @@ export async function GET(request: NextRequest) {
     const subscriptionId = session.subscription as string;
 
     // Get Firestore instance
-    const db = getDb();
-    const licensesRef = collection(db, "licenses");
+    const db = getAdminDb();
+    const licensesRef = db.collection("licenses");
 
     // Check if this session already has a license (webhook should have created it)
-    const existingQuery = query(
-      licensesRef,
-      where("stripeSessionId", "==", sessionId)
-    );
-    const existingDocs = await getDocs(existingQuery);
+    const existingDocs = await licensesRef.where("stripeSessionId", "==", sessionId).get();
 
     if (!existingDocs.empty) {
       // Return existing license key created by webhook
@@ -60,8 +55,7 @@ export async function GET(request: NextRequest) {
     for (let i = 0; i < 5; i++) {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
       
-      const retryQuery = query(licensesRef, where("stripeSessionId", "==", sessionId));
-      const retryDocs = await getDocs(retryQuery);
+      const retryDocs = await licensesRef.where("stripeSessionId", "==", sessionId).get();
       
       if (!retryDocs.empty) {
         const license = retryDocs.docs[0].data();
@@ -83,8 +77,7 @@ export async function GET(request: NextRequest) {
     // Ensure uniqueness
     let attempts = 0;
     while (attempts < 10) {
-      const keyQuery = query(licensesRef, where("key", "==", licenseKey));
-      const keyDocs = await getDocs(keyQuery);
+      const keyDocs = await licensesRef.where("key", "==", licenseKey).get();
       
       if (keyDocs.empty) {
         break;
@@ -95,7 +88,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Store license in Firestore
-    await addDoc(licensesRef, {
+    await licensesRef.add({
       key: licenseKey,
       email: email.toLowerCase().trim(),
       status: "active",

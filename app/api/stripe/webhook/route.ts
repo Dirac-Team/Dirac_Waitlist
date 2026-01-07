@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { Resend } from "resend";
-import { generateLicenseKey, createLicense } from "@/lib/license";
+import { generateLicenseKey } from "@/lib/license";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -55,12 +57,9 @@ export async function POST(request: NextRequest) {
         console.log("Processing checkout.session.completed for:", customerEmail);
 
         // Check if license already exists for this session (prevent duplicates)
-        const { db } = await import("@/lib/firebase");
-        const { collection, query, where, getDocs, addDoc, serverTimestamp } = await import("firebase/firestore");
-        
-        const licensesRef = collection(db, "licenses");
-        const existingQuery = query(licensesRef, where("stripeSessionId", "==", session.id));
-        const existingDocs = await getDocs(existingQuery);
+        const db = getAdminDb();
+        const licensesRef = db.collection("licenses");
+        const existingDocs = await licensesRef.where("stripeSessionId", "==", session.id).get();
         
         if (!existingDocs.empty) {
           console.log("License already exists for session:", session.id);
@@ -70,11 +69,11 @@ export async function POST(request: NextRequest) {
         // Generate and store license key with Stripe metadata
         const licenseKey = generateLicenseKey();
         
-        await addDoc(licensesRef, {
+        await licensesRef.add({
           key: licenseKey,
           email: customerEmail.toLowerCase().trim(),
           status: "active",
-          createdAt: serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
           boundDeviceId: null,
           deviceBoundAt: null,
           platform: null,

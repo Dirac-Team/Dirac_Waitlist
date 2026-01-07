@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebase";
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 import { generateLicenseKey } from "@/lib/license";
 import { Resend } from "resend";
 
@@ -33,20 +33,28 @@ export async function POST(request: NextRequest) {
     }
 
     // Get Firestore instance
-    const db = getDb();
-    const licensesRef = collection(db, "licenses");
+    const db = getAdminDb();
+    const licensesRef = db.collection("licenses");
 
     // Check if user already has a license
-    const existingQuery = query(licensesRef, where("email", "==", normalizedEmail));
-    const existingDocs = await getDocs(existingQuery);
+    const existingDocs = await licensesRef.where("email", "==", normalizedEmail).get();
 
     if (!existingDocs.empty) {
       // User already has a license - return existing one
-      const existingLicense = existingDocs.docs[0].data();
+      const existingLicense = existingDocs.docs[0].data() as any;
+      const rawTrialEndsAt = existingLicense.trialEndsAt;
+      const trialEndsAtIso =
+        rawTrialEndsAt?.toDate && typeof rawTrialEndsAt.toDate === "function"
+          ? rawTrialEndsAt.toDate().toISOString()
+          : rawTrialEndsAt instanceof Date
+            ? rawTrialEndsAt.toISOString()
+            : typeof rawTrialEndsAt === "string"
+              ? rawTrialEndsAt
+              : undefined;
       return NextResponse.json(
         {
           licenseKey: existingLicense.key,
-          trialEndsAt: existingLicense.trialEndsAt,
+          trialEndsAt: trialEndsAtIso,
           email: normalizedEmail,
           existing: true
         },
@@ -62,13 +70,13 @@ export async function POST(request: NextRequest) {
     const trialEndsAt = new Date(now.getTime() + (4 * 24 * 60 * 60 * 1000)); // 4 days
 
     // Create license document
-    await addDoc(licensesRef, {
+    await licensesRef.add({
       key: licenseKey,
       email: normalizedEmail,
       status: "trial",
       
       // Trial tracking
-      trialStartedAt: serverTimestamp(),
+      trialStartedAt: FieldValue.serverTimestamp(),
       trialEndsAt: trialEndsAt,
       trialReminderSent: false,
       
@@ -92,7 +100,7 @@ export async function POST(request: NextRequest) {
       preferences: preferences || null,
       
       // Metadata
-      createdAt: serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
 
     console.log("Trial license created:", {

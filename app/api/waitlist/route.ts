@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebase";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { getAdminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 
 // Initialize Resend with API key
@@ -15,7 +14,7 @@ export async function POST(request: NextRequest) {
     const { email } = await request.json();
     
     // Get Firestore instance
-    const db = getDb();
+    const db = getAdminDb();
 
     // Validate email
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -26,9 +25,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if email already exists
-    const waitlistRef = collection(db, "waitlist");
-    const q = query(waitlistRef, where("email", "==", email.toLowerCase().trim()));
-    const querySnapshot = await getDocs(q);
+    const waitlistRef = db.collection("waitlist");
+    const normalizedEmail = email.toLowerCase().trim();
+    const querySnapshot = await waitlistRef.where("email", "==", normalizedEmail).get();
 
     if (!querySnapshot.empty) {
       return NextResponse.json(
@@ -38,8 +37,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Add email to Firestore
-    const docRef = await addDoc(waitlistRef, {
-      email: email.toLowerCase().trim(),
+    const docRef = await waitlistRef.add({
+      email: normalizedEmail,
       createdAt: new Date().toISOString(),
       status: "pending",
     });
@@ -149,7 +148,7 @@ export async function POST(request: NextRequest) {
       { 
         success: true, 
         message: "Successfully added to waitlist",
-        id: docRef.id 
+        id: docRef.id
       },
       { status: 200 }
     );

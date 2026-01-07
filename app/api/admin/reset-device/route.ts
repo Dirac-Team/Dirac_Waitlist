@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebase";
-import { collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { getAdminDb } from "@/lib/firebaseAdmin";
+import { FieldValue } from "firebase-admin/firestore";
 
 // Admin endpoint to reset device_id for a license key
 // Requires admin API key for security
@@ -29,12 +29,11 @@ export async function POST(request: NextRequest) {
     const licenseKey = key.trim().toUpperCase();
 
     // Get Firestore instance
-    const db = getDb();
-    const licensesRef = collection(db, "licenses");
+    const db = getAdminDb();
+    const licensesRef = db.collection("licenses");
 
     // Query for the license key
-    const q = query(licensesRef, where("key", "==", licenseKey));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await licensesRef.where("key", "==", licenseKey).get();
 
     if (querySnapshot.empty) {
       return NextResponse.json(
@@ -47,10 +46,10 @@ export async function POST(request: NextRequest) {
     const licenseDoc = querySnapshot.docs[0];
 
     // Reset device binding fields
-    await updateDoc(doc(db, "licenses", licenseDoc.id), {
+    await licenseDoc.ref.update({
       boundDeviceId: null,
       deviceBoundAt: null,
-      lastDeviceReset: serverTimestamp(),
+      lastDeviceReset: FieldValue.serverTimestamp(),
     });
 
     return NextResponse.json(
