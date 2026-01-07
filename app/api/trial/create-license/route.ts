@@ -172,6 +172,17 @@ export async function POST(request: NextRequest) {
                               </ol>
                             </div>
 
+                            <!-- macOS Gatekeeper Help -->
+                            <div style="border: 2px solid #333; padding: 20px; margin: 24px 0; background-color: #111;">
+                              <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #ededed; text-transform: uppercase; letter-spacing: 0.05em;">
+                                If macOS blocks the app
+                              </p>
+                              <p style="margin: 0 0 10px 0; font-size: 14px; color: #999; line-height: 1.6;">
+                                If you see “can’t be opened” / “unidentified developer”, open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>, or run:
+                              </p>
+                              <pre style="margin: 0; padding: 12px; background: #000; color: #ededed; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.5;"><code>sudo xattr -rd com.apple.quarantine /Applications/Dirac.app</code></pre>
+                            </div>
+
                             <!-- Downloads (backup) -->
                             <div style="border: 2px solid #333; padding: 20px; margin: 24px 0; background-color: #111; text-align: center;">
                               <p style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #ededed; text-transform: uppercase; letter-spacing: 0.05em;">

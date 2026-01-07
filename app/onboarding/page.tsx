@@ -297,24 +297,6 @@ function OnboardingContent() {
               </span>
             </label>
 
-            {/* Download buttons (requested: on /onboarding?step=policy) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <a
-                href={DOWNLOAD_URLS.arm}
-                className="inline-block w-full px-6 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-xl
-                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all text-center"
-              >
-                Download (Apple Silicon)
-              </a>
-              <a
-                href={DOWNLOAD_URLS.intel}
-                className="inline-block w-full px-6 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-xl
-                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all text-center"
-              >
-                Download (Intel)
-              </a>
-            </div>
-
             <button
               onClick={handlePolicyAccept}
               disabled={!acceptedPolicy}
@@ -508,10 +490,14 @@ function OnboardingContent() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-bold text-[#ed5b25] dark:text-[#ff6a35]">2.</span>
-                  <span>Open the app and enter your license key when prompted</span>
+                  <span>Open the DMG and drag Dirac to your Applications folder</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-bold text-[#ed5b25] dark:text-[#ff6a35]">3.</span>
+                  <span>Open Dirac and paste your license key</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-[#ed5b25] dark:text-[#ff6a35]">4.</span>
                   <span>Configure your daily apps and enjoy your morning summaries!</span>
                 </li>
               </ol>
@@ -527,6 +513,25 @@ function OnboardingContent() {
                 Download Dirac
               </a>
             )}
+
+            {/* macOS help / troubleshooting */}
+            <div className="p-6 border-2 border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-left">
+              <h3 className="font-bold text-black dark:text-white mb-3">
+                If macOS blocks the app
+              </h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                If you see “Dirac can’t be opened” or it says the app is from an unidentified developer:
+              </p>
+              <ol className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-decimal pl-5">
+                <li>Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong> (if shown).</li>
+                <li>
+                  Or run this in Terminal:
+                  <div className="mt-2 p-3 rounded-lg bg-black text-white font-mono text-xs overflow-x-auto">
+                    sudo xattr -rd com.apple.quarantine /Applications/Dirac.app
+                  </div>
+                </li>
+              </ol>
+            </div>
 
             <div className="text-sm text-gray-500 space-y-1">
               <p>We emailed a copy of your license key and download links to {email}.</p>
