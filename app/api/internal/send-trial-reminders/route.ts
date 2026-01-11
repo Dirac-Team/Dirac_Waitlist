@@ -107,102 +107,137 @@ function renderEmailHtml(params: {
 }
 
 export async function POST(request: NextRequest) {
-  if (!requireCronAuth(request)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    if (!requireCronAuth(request)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const db = getAdminDb();
+    const licensesRef = db.collection("licenses");
+
+    const now = new Date();
+    const nowPlus24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const nowMinus48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
+
+    let day3Sent = 0;
+    let postExpirySent = 0;
+    const errors: Array<{ phase: string; docId?: string; message: string }> = [];
+
+    // Day 3 reminder: trial ends within 24h, and not expired yet
+    const day3Snap = await licensesRef
+      .where("status", "==", "trial")
+      .where("trialEndsAt", "<=", nowPlus24h)
+      .get();
+
+    for (const doc of day3Snap.docs) {
+      const data = doc.data() as any;
+      if (data.trialReminderSentDay3 === true) continue; // treat missing as not-sent
+      const trialEndsAt = toDateMaybe(data.trialEndsAt);
+      if (!trialEndsAt) continue;
+      if (trialEndsAt <= now) continue; // already expired
+
+      const email = data.email as string | undefined;
+      const licenseKey = (data.key as string | undefined)?.toString();
+      if (!email || !licenseKey) continue;
+
+      const upgradeUrl = upgradeUrlForKey(licenseKey);
+      try {
+        await resend.emails.send({
+          from: "peter@dirac.app",
+          to: email,
+          subject: "Your Dirac trial is ending soon",
+          html: renderEmailHtml({
+            type: "day3",
+            licenseKey,
+            upgradeUrl,
+            trialEndsAtIso: trialEndsAt.toISOString(),
+          }),
+        });
+
+        await doc.ref.update({
+          trialReminderSentDay3: true,
+          trialReminderSentDay3At: FieldValue.serverTimestamp(),
+        });
+        day3Sent++;
+      } catch (err: any) {
+        console.error("Day3 reminder failed", { docId: doc.id, err });
+        errors.push({
+          phase: "day3_send",
+          docId: doc.id,
+          message: err?.message || String(err),
+        });
+      }
+    }
+
+    // Post-expiry reminder: trial ended at least 48h ago
+    const postExpirySnap = await licensesRef
+      .where("status", "==", "trial")
+      .where("trialEndsAt", "<=", nowMinus48h)
+      .get();
+
+    for (const doc of postExpirySnap.docs) {
+      const data = doc.data() as any;
+      if (data.trialReminderSentPostExpiry === true) continue; // treat missing as not-sent
+      const trialEndsAt = toDateMaybe(data.trialEndsAt);
+      if (!trialEndsAt) continue;
+
+      const email = data.email as string | undefined;
+      const licenseKey = (data.key as string | undefined)?.toString();
+      if (!email || !licenseKey) continue;
+
+      const upgradeUrl = upgradeUrlForKey(licenseKey);
+      try {
+        await resend.emails.send({
+          from: "peter@dirac.app",
+          to: email,
+          subject: "Your Dirac trial has ended",
+          html: renderEmailHtml({
+            type: "postExpiry",
+            licenseKey,
+            upgradeUrl,
+            trialEndsAtIso: trialEndsAt.toISOString(),
+          }),
+        });
+
+        await doc.ref.update({
+          trialReminderSentPostExpiry: true,
+          trialReminderSentPostExpiryAt: FieldValue.serverTimestamp(),
+        });
+        postExpirySent++;
+      } catch (err: any) {
+        console.error("Post-expiry reminder failed", { docId: doc.id, err });
+        errors.push({
+          phase: "post_expiry_send",
+          docId: doc.id,
+          message: err?.message || String(err),
+        });
+      }
+    }
+
+    return NextResponse.json(
+      {
+        ok: true,
+        day3Candidates: day3Snap.size,
+        postExpiryCandidates: postExpirySnap.size,
+        day3Sent,
+        postExpirySent,
+        errors,
+        note:
+          "If this endpoint 500s with a Firestore 'requires an index' error, create a composite index for collection 'licenses' on fields: status (ASC), trialEndsAt (ASC).",
+      },
+      { status: 200 }
+    );
+  } catch (err: any) {
+    console.error("send-trial-reminders crashed", err);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: err?.message || String(err),
+        hint:
+          "Common causes: Firestore composite index needed for (status + trialEndsAt) query, missing Firebase Admin env vars, or Resend misconfiguration.",
+      },
+      { status: 500 }
+    );
   }
-
-  const db = getAdminDb();
-  const licensesRef = db.collection("licenses");
-
-  const now = new Date();
-  const nowPlus24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const nowMinus48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
-
-  let day3Sent = 0;
-  let postExpirySent = 0;
-
-  // Day 3 reminder: trial ends within 24h, and not expired yet
-  const day3Snap = await licensesRef
-    .where("status", "==", "trial")
-    .where("trialEndsAt", "<=", nowPlus24h)
-    .get();
-
-  for (const doc of day3Snap.docs) {
-    const data = doc.data() as any;
-    if (data.trialReminderSentDay3 === true) continue; // treat missing as not-sent
-    const trialEndsAt = toDateMaybe(data.trialEndsAt);
-    if (!trialEndsAt) continue;
-    if (trialEndsAt <= now) continue; // already expired
-
-    const email = data.email as string | undefined;
-    const licenseKey = (data.key as string | undefined)?.toString();
-    if (!email || !licenseKey) continue;
-
-    const upgradeUrl = upgradeUrlForKey(licenseKey);
-    await resend.emails.send({
-      from: "peter@dirac.app",
-      to: email,
-      subject: "Your Dirac trial is ending soon",
-      html: renderEmailHtml({
-        type: "day3",
-        licenseKey,
-        upgradeUrl,
-        trialEndsAtIso: trialEndsAt.toISOString(),
-      }),
-    });
-
-    await doc.ref.update({
-      trialReminderSentDay3: true,
-      trialReminderSentDay3At: FieldValue.serverTimestamp(),
-    });
-    day3Sent++;
-  }
-
-  // Post-expiry reminder: trial ended at least 48h ago
-  const postExpirySnap = await licensesRef
-    .where("status", "==", "trial")
-    .where("trialEndsAt", "<=", nowMinus48h)
-    .get();
-
-  for (const doc of postExpirySnap.docs) {
-    const data = doc.data() as any;
-    if (data.trialReminderSentPostExpiry === true) continue; // treat missing as not-sent
-    const trialEndsAt = toDateMaybe(data.trialEndsAt);
-    if (!trialEndsAt) continue;
-
-    const email = data.email as string | undefined;
-    const licenseKey = (data.key as string | undefined)?.toString();
-    if (!email || !licenseKey) continue;
-
-    const upgradeUrl = upgradeUrlForKey(licenseKey);
-    await resend.emails.send({
-      from: "peter@dirac.app",
-      to: email,
-      subject: "Your Dirac trial has ended",
-      html: renderEmailHtml({
-        type: "postExpiry",
-        licenseKey,
-        upgradeUrl,
-        trialEndsAtIso: trialEndsAt.toISOString(),
-      }),
-    });
-
-    await doc.ref.update({
-      trialReminderSentPostExpiry: true,
-      trialReminderSentPostExpiryAt: FieldValue.serverTimestamp(),
-    });
-    postExpirySent++;
-  }
-
-  return NextResponse.json(
-    {
-      ok: true,
-      day3Candidates: day3Snap.size,
-      postExpiryCandidates: postExpirySnap.size,
-      day3Sent,
-      postExpirySent,
-    },
-    { status: 200 }
-  );
 }
 
