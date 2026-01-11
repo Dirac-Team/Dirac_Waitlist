@@ -78,7 +78,11 @@ export async function POST(request: NextRequest) {
       // Trial tracking
       trialStartedAt: FieldValue.serverTimestamp(),
       trialEndsAt: trialEndsAt,
+      // Legacy flag (kept)
       trialReminderSent: false,
+      // New flags for scheduled reminders
+      trialReminderSentDay3: false,
+      trialReminderSentPostExpiry: false,
       
       // Subscription tracking
       subscriptionStartedAt: null,

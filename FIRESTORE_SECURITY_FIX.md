@@ -34,4 +34,21 @@ Use **one** of these approaches:
 - After publishing rules, try opening Firestore from an unauthenticated script / browser SDK: it should fail with **insufficient permissions**.
 - Your website API routes should still work (waitlist submit, trial license creation, license verify).
 
+## 4) Trial reminder cron (day 3 + 2 days after expiry)
+
+This repo includes an internal endpoint:
+- `POST /api/internal/send-trial-reminders`
+
+It sends:
+- **Day 3** reminder (trial ends within 24 hours)
+- **Post-expiry** reminder (2 days after trial ended)
+
+### Required secrets
+- **Netlify env var**: `CRON_SECRET` (any strong random string)
+- **GitHub repo secrets**:
+  - `CRON_SECRET` (same value)
+  - `DIRAC_BASE_URL` (e.g. `https://dirac.app`)
+
+The GitHub Actions workflow `.github/workflows/trial-reminders.yml` calls the endpoint **hourly** (works on Netlify personal).
+
 
