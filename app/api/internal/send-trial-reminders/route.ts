@@ -3,7 +3,8 @@ import { getAdminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 import { FieldValue } from "firebase-admin/firestore";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 function requireCronAuth(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -110,6 +111,9 @@ export async function POST(request: NextRequest) {
   try {
     if (!requireCronAuth(request)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!resend) {
+      return NextResponse.json({ ok: false, error: "RESEND_API_KEY is not set" }, { status: 500 });
     }
 
     const db = getAdminDb();

@@ -7,7 +7,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 if (!resendApiKey) {
   console.error("RESEND_API_KEY is not set in environment variables");
 }
-const resend = new Resend(resendApiKey);
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Send confirmation email (only if Resend is configured)
-    if (resendApiKey) {
+    if (resend) {
       try {
         const emailResult = await resend.emails.send({
           from: "peter@dirac.app",

@@ -4,7 +4,8 @@ import { Resend } from "resend";
 import { FieldValue } from "firebase-admin/firestore";
 import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 function requireAdminAuth(request: NextRequest) {
   const adminKey = process.env.ADMIN_API_KEY?.trim();
@@ -56,6 +57,9 @@ function renderUpdateEmail(toEmail: string) {
 export async function POST(request: NextRequest) {
   if (!requireAdminAuth(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (!resend) {
+    return NextResponse.json({ error: "RESEND_API_KEY is not set" }, { status: 500 });
   }
 
   const body = await request.json().catch(() => ({}));

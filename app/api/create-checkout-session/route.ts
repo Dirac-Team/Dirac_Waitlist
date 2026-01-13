@@ -1,13 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key, { apiVersion: "2025-11-17.clover" });
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, promoCode } = await request.json();
+    const { email, promoCode, licenseKey } = await request.json();
+
+    const normalizedLicenseKey =
+      typeof licenseKey === "string" && licenseKey.trim() ? licenseKey.trim().toUpperCase() : null;
+
+    // This endpoint is now used for UPGRADE only (trial is created without Stripe during onboarding).
+    if (!normalizedLicenseKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing licenseKey. Start a free trial in onboarding first, then upgrade using your license key.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const stripe = getStripe();
 
     // Prepare session configuration
     const sessionConfig: Stripe.Checkout.SessionCreateParams = {
@@ -19,10 +37,16 @@ export async function POST(request: NextRequest) {
           quantity: 1,
         },
       ],
-      success_url: `https://dirac.app/onboarding/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `https://dirac.app/onboarding?step=payment`,
+      // Upgrade flow: charge immediately and redirect to a simple close-tab page.
+      success_url: `https://dirac.app/upgrade/success`,
+      cancel_url: `https://dirac.app/upgrade?key=${encodeURIComponent(normalizedLicenseKey)}`,
+      metadata: {
+        licenseKey: normalizedLicenseKey,
+      },
       subscription_data: {
-        trial_period_days: 4,
+        metadata: {
+          licenseKey: normalizedLicenseKey,
+        },
       },
       // Note: allow_promotion_codes will be set below based on whether user provided a code
     };

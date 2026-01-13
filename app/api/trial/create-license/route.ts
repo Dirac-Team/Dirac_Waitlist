@@ -5,7 +5,8 @@ import { generateLicenseKey } from "@/lib/license";
 import { Resend } from "resend";
 import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
 
 export async function POST(request: NextRequest) {
   try {
@@ -110,8 +111,11 @@ export async function POST(request: NextRequest) {
       trialEndsAt: trialEndsAt.toISOString(),
     });
 
-    // Send welcome email with license key
+    // Send welcome email with license key (only if Resend configured)
     try {
+      if (!resend) {
+        console.warn("RESEND_API_KEY not configured; skipping trial welcome email");
+      } else {
       const primaryDownloadUrl =
         platform === "intel" ? CURRENT_DOWNLOAD_URLS.intel : platform === "arm" ? CURRENT_DOWNLOAD_URLS.arm : null;
 
@@ -250,6 +254,7 @@ export async function POST(request: NextRequest) {
       });
       
       console.log("Welcome email sent to:", normalizedEmail);
+      }
     } catch (emailError) {
       console.error("Failed to send welcome email:", emailError);
       // Don't fail the request if email fails

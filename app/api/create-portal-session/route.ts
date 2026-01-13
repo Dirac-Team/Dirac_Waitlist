@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key, { apiVersion: "2025-11-17.clover" });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Find customer by email
+    const stripe = getStripe();
     const customers = await stripe.customers.list({
       email: email.toLowerCase().trim(),
       limit: 1,

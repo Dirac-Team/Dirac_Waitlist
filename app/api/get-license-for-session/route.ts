@@ -3,9 +3,11 @@ import Stripe from "stripe";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { generateLicenseKey } from "@/lib/license";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-11-17.clover",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+  return new Stripe(key, { apiVersion: "2025-11-17.clover" });
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +22,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Retrieve the checkout session from Stripe
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     if (!session.customer_email && !session.customer_details?.email) {

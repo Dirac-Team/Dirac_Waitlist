@@ -33,10 +33,10 @@ export default function PaymentCancelPage() {
 
         <div className="space-y-4">
             <Link
-              href="/pricing"
+              href="/onboarding"
               className="inline-block px-8 py-4 mx-2 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold rounded-full hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] hover:scale-105 transition-all"
             >
-              Try Again
+              Start Free
             </Link>
             <Link
               href="/"
