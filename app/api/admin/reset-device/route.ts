@@ -8,9 +8,11 @@ export async function POST(request: NextRequest) {
   try {
     // Check admin API key
     const authHeader = request.headers.get("authorization");
-    const adminKey = process.env.ADMIN_API_KEY;
+    const adminKey = process.env.ADMIN_API_KEY?.trim();
+    const match = (authHeader || "").match(/^Bearer\s+(.+)$/i);
+    const token = match?.[1]?.trim();
 
-    if (!adminKey || authHeader !== `Bearer ${adminKey}`) {
+    if (!adminKey || !token || token !== adminKey) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

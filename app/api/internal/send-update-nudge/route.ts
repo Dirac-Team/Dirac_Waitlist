@@ -7,9 +7,11 @@ import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 function requireAdminAuth(request: NextRequest) {
-  const adminKey = process.env.ADMIN_API_KEY;
-  const authHeader = request.headers.get("authorization");
-  return Boolean(adminKey && authHeader === `Bearer ${adminKey}`);
+  const adminKey = process.env.ADMIN_API_KEY?.trim();
+  const authHeader = request.headers.get("authorization") || "";
+  const match = authHeader.match(/^Bearer\s+(.+)$/i);
+  const token = match?.[1]?.trim();
+  return Boolean(adminKey && token && token === adminKey);
 }
 
 function renderUpdateEmail(toEmail: string) {
