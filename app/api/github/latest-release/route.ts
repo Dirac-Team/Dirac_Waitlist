@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { PUBLIC_RELEASES_REPO } from "@/lib/publicReleases";
 
 type LatestRelease = {
   tag: string;
@@ -17,7 +18,8 @@ export async function GET() {
     return NextResponse.json(cached.value, { status: 200 });
   }
 
-  const repo = "PeterZZZNZ/Dirac";
+  // IMPORTANT: Use the public releases repo only (do not expose the private code repo).
+  const repo = PUBLIC_RELEASES_REPO;
   const url = `https://api.github.com/repos/${repo}/releases/latest`;
 
   const res = await fetch(url, {

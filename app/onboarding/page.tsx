@@ -3,13 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/mini-navbar";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
 type OnboardingStep = "email" | "download" | "policy" | "preferences" | "complete";
-
-const DOWNLOAD_URLS = {
-  intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
-  arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
-} as const;
 
 type LatestRelease = {
   tag: string;
@@ -156,9 +152,9 @@ function OnboardingContent() {
 
   const downloadUrl =
     selectedPlatform === "intel"
-      ? DOWNLOAD_URLS.intel
+      ? CURRENT_DOWNLOAD_URLS.intel
       : selectedPlatform === "arm"
-        ? DOWNLOAD_URLS.arm
+        ? CURRENT_DOWNLOAD_URLS.arm
         : null;
 
   useEffect(() => {
@@ -531,12 +527,18 @@ function OnboardingContent() {
               className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
                 hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
             >
-              Download Dirac
+              Download Dirac ({CURRENT_PUBLIC_VERSION})
             </a>
             )}
 
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Dirac updates automatically after installation. (First install uses a DMG — you never need to download a ZIP manually.)
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Latest public release:{" "}
+              <a className="underline" href={CURRENT_RELEASE_PAGE_URL} target="_blank" rel="noopener noreferrer">
+                {CURRENT_RELEASE_PAGE_URL}
+              </a>
             </p>
 
             {latestRelease?.tag && (
@@ -586,11 +588,11 @@ function OnboardingContent() {
               <p>We emailed a copy of your license key and download links to {email}.</p>
               <p>
                 Need the other build?{" "}
-                <a className="underline" href={DOWNLOAD_URLS.intel}>
+                <a className="underline" href={CURRENT_DOWNLOAD_URLS.intel}>
                   Intel
                 </a>{" "}
                 /{" "}
-                <a className="underline" href={DOWNLOAD_URLS.arm}>
+                <a className="underline" href={CURRENT_DOWNLOAD_URLS.arm}>
                   Apple Silicon
                 </a>
               </p>

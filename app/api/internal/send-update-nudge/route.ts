@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 import { FieldValue } from "firebase-admin/firestore";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,11 +11,6 @@ function requireAdminAuth(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   return Boolean(adminKey && authHeader === `Bearer ${adminKey}`);
 }
-
-const DOWNLOAD_URLS = {
-  intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
-  arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
-} as const;
 
 function renderUpdateEmail(toEmail: string) {
   return `<!DOCTYPE html>
@@ -34,10 +30,13 @@ function renderUpdateEmail(toEmail: string) {
                 <p style="margin:0 0 10px 0;font-size:13px;color:#999;">
                   Dirac updates automatically after installation. (First install uses a DMG — you never need to download a ZIP manually.)
                 </p>
+                <p style="margin:0 0 10px 0;font-size:13px;color:#777;">
+                  Current release: <a style="color:#777;text-decoration:underline;" href="${CURRENT_RELEASE_PAGE_URL}">${CURRENT_PUBLIC_VERSION}</a>
+                </p>
                 <p style="margin:0 0 8px 0;color:#ededed;font-weight:700;">Download latest DMG:</p>
                 <ul style="margin:0;padding-left:18px;color:#bdbdbd;">
-                  <li><a style="color:#ff6a35;text-decoration:none;" href="${DOWNLOAD_URLS.arm}">Apple Silicon (M1/M2/M3/M4)</a></li>
-                  <li><a style="color:#ff6a35;text-decoration:none;" href="${DOWNLOAD_URLS.intel}">Intel Mac</a></li>
+                  <li><a style="color:#ff6a35;text-decoration:none;" href="${CURRENT_DOWNLOAD_URLS.arm}">Apple Silicon (M1/M2/M3/M4)</a></li>
+                  <li><a style="color:#ff6a35;text-decoration:none;" href="${CURRENT_DOWNLOAD_URLS.intel}">Intel Mac</a></li>
                 </ul>
               </div>
             </td></tr>

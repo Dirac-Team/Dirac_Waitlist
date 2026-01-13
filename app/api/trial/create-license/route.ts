@@ -3,12 +3,9 @@ import { getAdminDb } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { generateLicenseKey } from "@/lib/license";
 import { Resend } from "resend";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const DOWNLOAD_URLS = {
-  intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
-  arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
-} as const;
 
 export async function POST(request: NextRequest) {
   try {
@@ -116,7 +113,7 @@ export async function POST(request: NextRequest) {
     // Send welcome email with license key
     try {
       const primaryDownloadUrl =
-        platform === "intel" ? DOWNLOAD_URLS.intel : platform === "arm" ? DOWNLOAD_URLS.arm : null;
+        platform === "intel" ? CURRENT_DOWNLOAD_URLS.intel : platform === "arm" ? CURRENT_DOWNLOAD_URLS.arm : null;
 
       await resend.emails.send({
         from: "peter@dirac.app",
@@ -201,10 +198,13 @@ export async function POST(request: NextRequest) {
                                 Download Links (Backup)
                               </p>
                               <p style="margin: 0 0 10px 0; font-size: 14px; color: #999;">
-                                Apple Silicon (M1/M2/M3/M4): <a href="${DOWNLOAD_URLS.arm}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                                Apple Silicon (M1/M2/M3/M4): <a href="${CURRENT_DOWNLOAD_URLS.arm}" style="color: #ff6a35; text-decoration: none;">Download</a>
                               </p>
                               <p style="margin: 0; font-size: 14px; color: #999;">
-                                Intel Mac: <a href="${DOWNLOAD_URLS.intel}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                                Intel Mac: <a href="${CURRENT_DOWNLOAD_URLS.intel}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                              </p>
+                              <p style="margin: 12px 0 0 0; font-size: 12px; color: #777;">
+                                Release: <a href="${CURRENT_RELEASE_PAGE_URL}" style="color: #777;">${CURRENT_PUBLIC_VERSION}</a>
                               </p>
                             </div>
                             
