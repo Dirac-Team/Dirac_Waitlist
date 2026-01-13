@@ -93,13 +93,13 @@ export async function POST(request: NextRequest) {
           );
         }
       } else {
-        return NextResponse.json(
-          {
-            status: "inactive",
+      return NextResponse.json(
+        { 
+          status: "inactive",
             message: "License key is not active",
-          },
-          { status: 200 }
-        );
+        },
+        { status: 200 }
+      );
       }
     }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/mini-navbar";
 
@@ -10,6 +10,14 @@ const DOWNLOAD_URLS = {
   intel: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-intel.dmg",
   arm: "https://github.com/Dirac-Team/Dirac_Waitlist/releases/download/v1.0.0/Dirac-ARM.dmg",
 } as const;
+
+type LatestRelease = {
+  tag: string;
+  name?: string | null;
+  publishedAt?: string | null;
+  body?: string | null;
+  htmlUrl?: string | null;
+};
 
 function OnboardingContent() {
   const searchParams = useSearchParams();
@@ -28,6 +36,8 @@ function OnboardingContent() {
   const [createError, setCreateError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [latestRelease, setLatestRelease] = useState<LatestRelease | null>(null);
+  const [latestReleaseError, setLatestReleaseError] = useState<string | null>(null);
 
   const appOptions = [
     "GitHub",
@@ -81,7 +91,7 @@ function OnboardingContent() {
     const finalApps = otherApp.trim() 
       ? [...bestApps, `Other: ${otherApp.trim()}`] 
       : bestApps;
-
+    
     if (!selectedPlatform) {
       setCreateError("Please select your Mac chip type first.");
       setStep("download");
@@ -96,8 +106,8 @@ function OnboardingContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email,
-          platform: selectedPlatform,
+      email,
+      platform: selectedPlatform,
           preferences: {
             apps: finalApps,
             referralSource,
@@ -121,8 +131,8 @@ function OnboardingContent() {
       // Store for convenience
       localStorage.setItem("dirac_license_key", data.licenseKey);
       localStorage.setItem("dirac_email", data.email ?? email);
-
-      setStep("complete");
+    
+    setStep("complete");
     } catch (err: any) {
       console.error("Error creating trial license:", err);
       setCreateError(err?.message || "Failed to create your trial license. Please try again.");
@@ -150,6 +160,17 @@ function OnboardingContent() {
       : selectedPlatform === "arm"
         ? DOWNLOAD_URLS.arm
         : null;
+
+  useEffect(() => {
+    // Optional UX: show latest version + notes (no token; public API)
+    fetch("/api/github/latest-release")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.tag) setLatestRelease(data as LatestRelease);
+        else if (data?.error) setLatestReleaseError(String(data.error));
+      })
+      .catch((e) => setLatestReleaseError(e?.message || "Failed to fetch release info"));
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black relative overflow-hidden">
@@ -504,14 +525,42 @@ function OnboardingContent() {
             </div>
 
             {downloadUrl && (
-              <a
+            <a
                 href={downloadUrl}
-                onClick={handleDownloadClick}
-                className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
-                  hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
-              >
-                Download Dirac
-              </a>
+              onClick={handleDownloadClick}
+              className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
+                hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
+            >
+              Download Dirac
+            </a>
+            )}
+
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Dirac updates automatically after installation. (First install uses a DMG — you never need to download a ZIP manually.)
+            </p>
+
+            {latestRelease?.tag && (
+              <details className="p-6 border-2 border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-left">
+                <summary className="cursor-pointer font-bold text-black dark:text-white">
+                  Latest version: {latestRelease.tag}
+                </summary>
+                {latestRelease.body && (
+                  <pre className="mt-4 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+                    {latestRelease.body}
+                  </pre>
+                )}
+                {latestRelease.htmlUrl && (
+                  <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                    Full release:{" "}
+                    <a className="underline" href={latestRelease.htmlUrl} target="_blank" rel="noopener noreferrer">
+                      {latestRelease.htmlUrl}
+                    </a>
+                  </p>
+                )}
+              </details>
+            )}
+            {latestReleaseError && (
+              <p className="text-xs text-gray-500">Release info unavailable: {latestReleaseError}</p>
             )}
 
             {/* macOS help / troubleshooting */}

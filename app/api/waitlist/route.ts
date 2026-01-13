@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
       { 
         success: true, 
         message: "Successfully added to waitlist",
-        id: docRef.id
+        id: docRef.id 
       },
       { status: 200 }
     );

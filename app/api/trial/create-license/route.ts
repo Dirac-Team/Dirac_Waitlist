@@ -217,6 +217,10 @@ export async function POST(request: NextRequest) {
                                 Your 4-day free trial started today. No payment required right now. If you want to keep using Dirac after the trial, you can upgrade any time.
                               </p>
                             </div>
+
+                            <p style="margin: 0; font-size: 13px; color: #999; line-height: 1.6;">
+                              Dirac updates automatically after installation. (First install uses a DMG — you never need to download a ZIP manually.)
+                            </p>
                             
                             <p style="margin: 32px 0 0 0; font-size: 15px; color: #999; line-height: 1.6;">
                               Need help? Reply to this email or contact us at <a href="mailto:peter@dirac.app" style="color: #ff6a35; text-decoration: none;">peter@dirac.app</a>
