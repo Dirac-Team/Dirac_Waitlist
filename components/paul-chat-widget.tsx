@@ -59,7 +59,7 @@ export function PaulChatWidget() {
                    hover:bg-[#ff7d4d] transition-colors border-2 border-black/20"
         aria-label="Open Paul chat"
       >
-        Paul
+        Ask Paul
       </button>
 
       {/* Panel */}

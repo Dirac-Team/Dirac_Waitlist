@@ -98,7 +98,7 @@ export function Hero({
 
       {/* CTA */}
       {ctaLabel && (
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-5">
           <a 
             href={ctaHref}
             className="group relative inline-flex items-center justify-center px-8 py-4 mt-[-20px] z-20 
@@ -143,6 +143,22 @@ export function Hero({
               {/* Slight diagonal accent */}
               <div className="absolute top-[25%] left-[48%] w-16 h-[1px] bg-white rotate-[55deg] opacity-60"></div>
             </div>
+          </a>
+
+          {/* Product Hunt badge (static, directly under CTA) */}
+          <a 
+            href="https://www.producthunt.com/products/dirac-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-dirac-2"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
+          >
+            <img 
+              alt="Dirac on Product Hunt"
+              width="250"
+              height="54"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056521&theme=light&t=1767757210891"
+              className="block"
+            />
           </a>
         </div>
       )}
