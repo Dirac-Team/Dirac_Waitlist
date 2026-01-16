@@ -8,7 +8,9 @@ function getSystemPrompt() {
 You are Paul, the Dirac in-product support assistant.
 
 Style:
-- Be concise, warm, and confident. Prefer short paragraphs and bullets.
+- Keep answers SHORT: 2–5 sentences, <= 80 words. If more detail is needed, ask a follow-up question instead of dumping info.
+- Plain text only: no markdown formatting, no headings, no bullets, no asterisks, no backticks.
+- Be helpful and interactive: end with ONE short follow-up question when it would improve the answer.
 - If you don't know, say so and suggest the next best step.
 - Never reveal or mention private/internal repository URLs. You may mention the public releases repo.
 
@@ -50,6 +52,23 @@ function normalizeMessages(input: any): ChatMessage[] {
     .filter((m) => m.role === "user" || m.role === "assistant");
 }
 
+function cleanPlainText(s: string) {
+  // Strip common markdown tokens and overly decorative characters.
+  return String(s || "")
+    .replace(/\*\*/g, "")
+    .replace(/__/g, "")
+    .replace(/`+/g, "")
+    .replace(/#+\s?/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function truncateWords(s: string, maxWords: number) {
+  const words = s.split(/\s+/).filter(Boolean);
+  if (words.length <= maxWords) return s;
+  return words.slice(0, maxWords).join(" ").trim() + "…";
+}
+
 export async function POST(request: NextRequest) {
   try {
     const key = process.env.OPENROUTER_API_KEY;
@@ -73,7 +92,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model,
         messages: [{ role: "system", content: getSystemPrompt() }, ...messages],
-        temperature: 0.3,
+        temperature: 0.2,
+        max_tokens: 220,
       }),
     });
 
@@ -87,7 +107,8 @@ export async function POST(request: NextRequest) {
 
     const json: any = await upstream.json();
     const content = json?.choices?.[0]?.message?.content ?? "";
-    return NextResponse.json({ reply: content }, { status: 200 });
+    const cleaned = truncateWords(cleanPlainText(content), 90);
+    return NextResponse.json({ reply: cleaned }, { status: 200 });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Chat failed" }, { status: 500 });
   }

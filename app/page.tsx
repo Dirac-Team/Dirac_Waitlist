@@ -12,23 +12,25 @@ export default function Home() {
         ctaLabel="Try for Free"
         ctaHref="/onboarding"
       />
-      
-      {/* Product Hunt Badge */}
-      <div className="fixed bottom-8 right-8 z-50 animate-fade-up opacity-0 hover:scale-105 transition-transform duration-200">
-        <a 
-          href="https://www.producthunt.com/products/dirac-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-dirac-2" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="block shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <img 
-            alt="Dirac - Start your day with full context, zero tab-hopping | Product Hunt" 
-            width="250" 
-            height="54" 
-            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056521&theme=light&t=1767757210891"
-            className="block"
-          />
-        </a>
+
+      {/* Product Hunt Badge (static near hero; avoids overlapping Paul widget) */}
+      <div className="relative -mt-10 mb-10 px-6 md:px-8">
+        <div className="max-w-4xl mx-auto flex justify-center md:justify-end">
+          <a
+            href="https://www.producthunt.com/products/dirac-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-dirac-2"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
+          >
+            <img
+              alt="Dirac - Start your day with full context, zero tab-hopping | Product Hunt"
+              width="250"
+              height="54"
+              src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056521&theme=light&t=1767757210891"
+              className="block"
+            />
+          </a>
+        </div>
       </div>
 
       {/* Founder note */}
@@ -46,8 +48,8 @@ export default function Home() {
           <div className="space-y-3">
             <h2 className="text-2xl md:text-3xl font-bold text-white">A note from the founder</h2>
             <p className="text-gray-300 text-base leading-relaxed">
-              I built Dirac because I was tired of starting my day by tab-hopping across GitHub, email, Stripe, and analytics.
-              Dirac turns that into one click and one summary—so you can get into real work faster.
+              Hey, I’m Peter, founder of Dirac. Just like you (maybe) I'm a sucker for efficiency, but most tools made me spend more time figuring out “how to use them” than actually saving time.
+              Hopefully, you'll find that Dirac is the exception: it fits into your workflow, not the other way around.
             </p>
             <p className="text-gray-400 text-sm">
               — Peter
