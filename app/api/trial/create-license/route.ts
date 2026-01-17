@@ -3,7 +3,8 @@ import { getAdminDb } from "@/lib/firebaseAdmin";
 import { FieldValue } from "firebase-admin/firestore";
 import { generateLicenseKey } from "@/lib/license";
 import { Resend } from "resend";
-import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL, LATEST_RELEASE_PAGE_URL } from "@/lib/publicReleases";
+import { getLatestPublicRelease } from "@/lib/latestPublicRelease";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -116,8 +117,16 @@ export async function POST(request: NextRequest) {
       if (!resend) {
         console.warn("RESEND_API_KEY not configured; skipping trial welcome email");
       } else {
+      const latest = await getLatestPublicRelease();
+      const effectiveVersion = latest.tag || CURRENT_PUBLIC_VERSION;
+      const effectiveReleasePage = latest.releasePageLatestUrl || LATEST_RELEASE_PAGE_URL;
+      const effectiveDownloadUrls = {
+        arm: latest.dmgArm64Url || CURRENT_DOWNLOAD_URLS.arm,
+        intel: latest.dmgIntelUrl || CURRENT_DOWNLOAD_URLS.intel,
+      };
+
       const primaryDownloadUrl =
-        platform === "intel" ? CURRENT_DOWNLOAD_URLS.intel : platform === "arm" ? CURRENT_DOWNLOAD_URLS.arm : null;
+        platform === "intel" ? effectiveDownloadUrls.intel : platform === "arm" ? effectiveDownloadUrls.arm : null;
 
       await resend.emails.send({
         from: "peter@dirac.app",
@@ -185,16 +194,9 @@ export async function POST(request: NextRequest) {
                               </ol>
                             </div>
 
-                            <!-- macOS Gatekeeper Help -->
-                            <div style="border: 2px solid #333; padding: 20px; margin: 24px 0; background-color: #111;">
-                              <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: 600; color: #ededed; text-transform: uppercase; letter-spacing: 0.05em;">
-                                If macOS blocks the app
-                              </p>
-                              <p style="margin: 0 0 10px 0; font-size: 14px; color: #999; line-height: 1.6;">
-                                If you see “can’t be opened” / “unidentified developer”, open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>, or run:
-                              </p>
-                              <pre style="margin: 0; padding: 12px; background: #000; color: #ededed; border-radius: 8px; overflow-x: auto; font-size: 12px; line-height: 1.5;"><code>sudo xattr -rd com.apple.quarantine /Applications/Dirac.app</code></pre>
-                            </div>
+                            <p style="margin: 0 0 16px 0; font-size: 13px; color: #999; line-height: 1.6;">
+                              No xattr step required (signed + notarized). Dirac updates automatically after installation.
+                            </p>
 
                             <!-- Downloads (backup) -->
                             <div style="border: 2px solid #333; padding: 20px; margin: 24px 0; background-color: #111; text-align: center;">
@@ -202,13 +204,13 @@ export async function POST(request: NextRequest) {
                                 Download Links (Backup)
                               </p>
                               <p style="margin: 0 0 10px 0; font-size: 14px; color: #999;">
-                                Apple Silicon (M1/M2/M3/M4): <a href="${CURRENT_DOWNLOAD_URLS.arm}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                                Apple Silicon (M1/M2/M3/M4): <a href="${effectiveDownloadUrls.arm}" style="color: #ff6a35; text-decoration: none;">Download</a>
                               </p>
                               <p style="margin: 0; font-size: 14px; color: #999;">
-                                Intel Mac: <a href="${CURRENT_DOWNLOAD_URLS.intel}" style="color: #ff6a35; text-decoration: none;">Download</a>
+                                Intel Mac: <a href="${effectiveDownloadUrls.intel}" style="color: #ff6a35; text-decoration: none;">Download</a>
                               </p>
                               <p style="margin: 12px 0 0 0; font-size: 12px; color: #777;">
-                                Release: <a href="${CURRENT_RELEASE_PAGE_URL}" style="color: #777;">${CURRENT_PUBLIC_VERSION}</a>
+                                Release: <a href="${effectiveReleasePage}" style="color: #777;">${effectiveVersion}</a>
                               </p>
                             </div>
                             

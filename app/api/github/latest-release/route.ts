@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { PUBLIC_RELEASES_REPO } from "@/lib/publicReleases";
+import { getLatestPublicRelease } from "@/lib/latestPublicRelease";
 
 type LatestRelease = {
   tag: string;
@@ -7,6 +7,9 @@ type LatestRelease = {
   publishedAt?: string | null;
   body?: string | null;
   htmlUrl?: string | null;
+  releasePageLatestUrl?: string | null;
+  dmgArm64Url?: string | null;
+  dmgIntelUrl?: string | null;
 };
 
 let cached: { at: number; value: LatestRelease } | null = null;
@@ -18,34 +21,23 @@ export async function GET() {
     return NextResponse.json(cached.value, { status: 200 });
   }
 
-  // IMPORTANT: Use the public releases repo only (do not expose the private code repo).
-  const repo = PUBLIC_RELEASES_REPO;
-  const url = `https://api.github.com/repos/${repo}/releases/latest`;
-
-  const res = await fetch(url, {
-    headers: {
-      "Accept": "application/vnd.github+json",
-      "User-Agent": "dirac.app (release-notes)",
-    },
-    // Netlify/edge caching varies; we manage our own in-memory TTL too.
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
+  const latest = await getLatestPublicRelease();
+  if (!latest.tag) {
     return NextResponse.json(
-      { error: `Failed to fetch latest release (${res.status})`, details: text.slice(0, 500) },
+      { error: "Failed to fetch latest release" },
       { status: 502 }
     );
   }
 
-  const json: any = await res.json();
   const value: LatestRelease = {
-    tag: json.tag_name,
-    name: json.name ?? null,
-    publishedAt: json.published_at ?? null,
-    body: json.body ?? null,
-    htmlUrl: json.html_url ?? null,
+    tag: latest.tag,
+    name: latest.name ?? null,
+    publishedAt: latest.publishedAt ?? null,
+    body: latest.body ?? null,
+    htmlUrl: latest.htmlUrl ?? null,
+    releasePageLatestUrl: latest.releasePageLatestUrl,
+    dmgArm64Url: latest.dmgArm64Url,
+    dmgIntelUrl: latest.dmgIntelUrl,
   };
 
   cached = { at: now, value };

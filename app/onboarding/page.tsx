@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/ui/mini-navbar";
-import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL, LATEST_RELEASE_PAGE_URL } from "@/lib/publicReleases";
 
 type OnboardingStep = "email" | "download" | "policy" | "preferences" | "complete";
 
@@ -13,6 +13,9 @@ type LatestRelease = {
   publishedAt?: string | null;
   body?: string | null;
   htmlUrl?: string | null;
+  releasePageLatestUrl?: string | null;
+  dmgArm64Url?: string | null;
+  dmgIntelUrl?: string | null;
 };
 
 function OnboardingContent() {
@@ -150,11 +153,18 @@ function OnboardingContent() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const effectiveVersion = latestRelease?.tag || CURRENT_PUBLIC_VERSION;
+  const releasePageUrl = latestRelease?.releasePageLatestUrl || LATEST_RELEASE_PAGE_URL;
+  const effectiveDownloadUrls = {
+    intel: latestRelease?.dmgIntelUrl || CURRENT_DOWNLOAD_URLS.intel,
+    arm: latestRelease?.dmgArm64Url || CURRENT_DOWNLOAD_URLS.arm,
+  };
+
   const downloadUrl =
     selectedPlatform === "intel"
-      ? CURRENT_DOWNLOAD_URLS.intel
+      ? effectiveDownloadUrls.intel
       : selectedPlatform === "arm"
-        ? CURRENT_DOWNLOAD_URLS.arm
+        ? effectiveDownloadUrls.arm
         : null;
 
   useEffect(() => {
@@ -521,13 +531,13 @@ function OnboardingContent() {
             </div>
 
             {downloadUrl && (
-            <a
-                href={downloadUrl}
+                <a
+                  href={downloadUrl}
               onClick={handleDownloadClick}
               className="inline-block w-full px-8 py-4 bg-[#ed5b25] dark:bg-[#ff6a35] text-white font-bold text-lg rounded-xl
                 hover:bg-[#d94e1f] dark:hover:bg-[#ff7d4d] transition-all"
             >
-              Download Dirac ({CURRENT_PUBLIC_VERSION})
+                Download Dirac ({effectiveVersion})
             </a>
             )}
 
@@ -536,8 +546,8 @@ function OnboardingContent() {
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Latest public release:{" "}
-              <a className="underline" href={CURRENT_RELEASE_PAGE_URL} target="_blank" rel="noopener noreferrer">
-                {CURRENT_RELEASE_PAGE_URL}
+              <a className="underline" href={releasePageUrl} target="_blank" rel="noopener noreferrer">
+                {releasePageUrl}
               </a>
             </p>
 
@@ -565,34 +575,19 @@ function OnboardingContent() {
               <p className="text-xs text-gray-500">Release info unavailable: {latestReleaseError}</p>
             )}
 
-            {/* macOS help / troubleshooting */}
-            <div className="p-6 border-2 border-gray-300 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-900 text-left">
-              <h3 className="font-bold text-black dark:text-white mb-3">
-                If macOS blocks the app
-              </h3>
-              <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                If you see “Dirac can’t be opened” or it says the app is from an unidentified developer:
-              </p>
-              <ol className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-decimal pl-5">
-                <li>Open <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong> (if shown).</li>
-                <li>
-                  Or run this in Terminal:
-                  <div className="mt-2 p-3 rounded-lg bg-black text-white font-mono text-xs overflow-x-auto">
-                    sudo xattr -rd com.apple.quarantine /Applications/Dirac.app
-                  </div>
-                </li>
-              </ol>
-            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              No xattr step required (signed + notarized).
+            </p>
 
             <div className="text-sm text-gray-500 space-y-1">
               <p>We emailed a copy of your license key and download links to {email}.</p>
               <p>
                 Need the other build?{" "}
-                <a className="underline" href={CURRENT_DOWNLOAD_URLS.intel}>
+                <a className="underline" href={effectiveDownloadUrls.intel}>
                   Intel
                 </a>{" "}
                 /{" "}
-                <a className="underline" href={CURRENT_DOWNLOAD_URLS.arm}>
+                <a className="underline" href={effectiveDownloadUrls.arm}>
                   Apple Silicon
                 </a>
               </p>

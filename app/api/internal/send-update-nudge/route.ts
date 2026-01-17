@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { Resend } from "resend";
 import { FieldValue } from "firebase-admin/firestore";
-import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL } from "@/lib/publicReleases";
+import { CURRENT_DOWNLOAD_URLS, CURRENT_PUBLIC_VERSION, CURRENT_RELEASE_PAGE_URL, LATEST_RELEASE_PAGE_URL } from "@/lib/publicReleases";
+import { getLatestPublicRelease } from "@/lib/latestPublicRelease";
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -15,7 +16,13 @@ function requireAdminAuth(request: NextRequest) {
   return Boolean(adminKey && token && token === adminKey);
 }
 
-function renderUpdateEmail(toEmail: string) {
+function renderUpdateEmail(params: {
+  toEmail: string;
+  version: string;
+  releasePageUrl: string;
+  armUrl: string;
+  intelUrl: string;
+}) {
   return `<!DOCTYPE html>
   <html lang="en">
     <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Dirac Update</title></head>
@@ -34,18 +41,18 @@ function renderUpdateEmail(toEmail: string) {
                   Dirac updates automatically after installation. (First install uses a DMG — you never need to download a ZIP manually.)
                 </p>
                 <p style="margin:0 0 10px 0;font-size:13px;color:#777;">
-                  Current release: <a style="color:#777;text-decoration:underline;" href="${CURRENT_RELEASE_PAGE_URL}">${CURRENT_PUBLIC_VERSION}</a>
+                  Latest release: <a style="color:#777;text-decoration:underline;" href="${params.releasePageUrl}">${params.version}</a>
                 </p>
                 <p style="margin:0 0 8px 0;color:#ededed;font-weight:700;">Download latest DMG:</p>
                 <ul style="margin:0;padding-left:18px;color:#bdbdbd;">
-                  <li><a style="color:#ff6a35;text-decoration:none;" href="${CURRENT_DOWNLOAD_URLS.arm}">Apple Silicon (M1/M2/M3/M4)</a></li>
-                  <li><a style="color:#ff6a35;text-decoration:none;" href="${CURRENT_DOWNLOAD_URLS.intel}">Intel Mac</a></li>
+                  <li><a style="color:#ff6a35;text-decoration:none;" href="${params.armUrl}">Apple Silicon (M1/M2/M3/M4)</a></li>
+                  <li><a style="color:#ff6a35;text-decoration:none;" href="${params.intelUrl}">Intel Mac</a></li>
                 </ul>
               </div>
             </td></tr>
 
             <tr><td style="padding:24px;text-align:center;border-top:1px solid #222;">
-              <p style="margin:0;font-size:12px;color:#777;">Sent to ${toEmail}</p>
+              <p style="margin:0;font-size:12px;color:#777;">Sent to ${params.toEmail}</p>
             </td></tr>
           </table>
         </td></tr>
@@ -74,6 +81,12 @@ export async function POST(request: NextRequest) {
     .limit(limit)
     .get();
 
+  const latest = await getLatestPublicRelease();
+  const version = latest.tag || CURRENT_PUBLIC_VERSION;
+  const releasePageUrl = latest.releasePageLatestUrl || LATEST_RELEASE_PAGE_URL;
+  const armUrl = latest.dmgArm64Url || CURRENT_DOWNLOAD_URLS.arm;
+  const intelUrl = latest.dmgIntelUrl || CURRENT_DOWNLOAD_URLS.intel;
+
   let sent = 0;
   const errors: Array<{ docId: string; message: string }> = [];
 
@@ -86,7 +99,7 @@ export async function POST(request: NextRequest) {
         from: "peter@dirac.app",
         to: email,
         subject: "Dirac update: download the latest build once",
-        html: renderUpdateEmail(email),
+        html: renderUpdateEmail({ toEmail: email, version, releasePageUrl, armUrl, intelUrl }),
       });
       await doc.ref.update({
         updateNudgeSentAt: FieldValue.serverTimestamp(),

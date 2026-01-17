@@ -12,3 +12,5 @@ export const CURRENT_DOWNLOAD_URLS = {
 
 export const CURRENT_RELEASE_PAGE_URL = `https://github.com/${PUBLIC_RELEASES_REPO}/releases/tag/${CURRENT_PUBLIC_VERSION}` as const;
 
+// Always-latest release page (public)
+export const LATEST_RELEASE_PAGE_URL = `https://github.com/${PUBLIC_RELEASES_REPO}/releases/latest` as const;
