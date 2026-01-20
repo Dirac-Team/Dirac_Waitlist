@@ -218,7 +218,7 @@ function OnboardingContent() {
               Welcome to Dirac
             </h1>
             <p className="text-lg text-gray-700 dark:text-gray-300 mb-8">
-              Let's get you started with your 4-day free trial
+              Let's get you started with your 10-day free trial
             </p>
             
             <form onSubmit={handleEmailSubmit} className="space-y-4">

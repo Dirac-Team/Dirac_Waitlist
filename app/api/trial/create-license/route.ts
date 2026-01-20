@@ -64,9 +64,9 @@ export async function POST(request: NextRequest) {
     // Generate new license key
     const licenseKey = generateLicenseKey();
 
-    // Calculate trial end date (4 days from now)
+    // Calculate trial end date (10 days from now)
     const now = new Date();
-    const trialEndsAt = new Date(now.getTime() + (4 * 24 * 60 * 60 * 1000)); // 4 days
+    const trialEndsAt = new Date(now.getTime() + (10 * 24 * 60 * 60 * 1000)); // 10 days
 
     // Create license document
     await licensesRef.add({
@@ -79,8 +79,9 @@ export async function POST(request: NextRequest) {
       trialEndsAt: trialEndsAt,
       // Legacy flag (kept)
       trialReminderSent: false,
-      // New flags for scheduled reminders
+      // New flags for scheduled reminders (keep legacy Day3 field for backwards compatibility)
       trialReminderSentDay3: false,
+      trialReminderSentDay7: false,
       trialReminderSentPostExpiry: false,
       
       // Subscription tracking
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       await resend.emails.send({
         from: "peter@dirac.app",
         to: normalizedEmail,
-        subject: "Welcome to Dirac - Your 4-Day Free Trial Starts Now!",
+        subject: "Welcome to Dirac - Your 10-Day Free Trial Starts Now!",
         html: `
           <!DOCTYPE html>
           <html lang="en">
@@ -159,7 +160,7 @@ export async function POST(request: NextRequest) {
                         <td style="padding: 0 40px;">
                           <div style="background-image: linear-gradient(to right, #333 1px, transparent 1px), linear-gradient(to bottom, #333 1px, transparent 1px); background-size: 24px 24px; padding: 40px; border: 2px solid #ededed;">
                             <p style="margin: 0 0 24px 0; font-size: 18px; color: #ededed; font-weight: 500;">
-                              Your 4-day free trial has started!
+                              Your 10-day free trial has started!
                             </p>
                             
                             <!-- License Key Box -->
@@ -220,7 +221,7 @@ export async function POST(request: NextRequest) {
                                 Trial Details
                               </p>
                               <p style="margin: 0; font-size: 14px; color: #999; line-height: 1.6;">
-                                Your 4-day free trial started today. No payment required right now. If you want to keep using Dirac after the trial, you can upgrade any time.
+                                Your 10-day free trial started today. No payment required right now. If you want to keep using Dirac after the trial, you can upgrade any time.
                               </p>
                             </div>
 

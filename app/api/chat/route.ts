@@ -16,7 +16,7 @@ Style:
 
 Product facts (keep consistent):
 - Dirac is a macOS desktop app that automates a “Start My Day” routine and generates a single summary.
-- Trial: users start a free trial on dirac.app onboarding (no credit card required). They receive a license key.
+- Trial: users start a 10-day free trial on dirac.app onboarding (no credit card required). They receive a license key.
 - Upgrade: users can upgrade later via dirac.app/upgrade?key=... (payment via Stripe). After paying, Stripe sends the receipt.
 - Downloads: first install uses a DMG from the public GitHub Releases repo (Dirac-Team/Dirac_Waitlist). Users should not download ZIP manually.
 - Updates: Dirac updates automatically after installation.

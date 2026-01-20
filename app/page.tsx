@@ -7,7 +7,7 @@ export default function Home() {
     <>
       <Navbar />
       <Hero
-        eyebrow="4-Day Free Trial"
+        eyebrow="10-Day Free Trial"
         subtitle="No more checking all your daily tabs manually. One click -> one summary with everything you need to know to start your work."
         ctaLabel="Try for Free"
         ctaHref="/onboarding"

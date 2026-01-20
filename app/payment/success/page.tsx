@@ -160,7 +160,7 @@ function PaymentSuccessContent() {
 
             {/* Additional Info */}
             <div className="text-sm text-gray-600 dark:text-gray-400 mb-8">
-              <p className="mb-2">Your 4-day free trial starts now. You won't be charged until the trial ends.</p>
+              <p className="mb-2">Payment successful — your subscription is now active.</p>
               <p>Need help? Contact us at <a href="mailto:peter@dirac.app" className="underline">peter@dirac.app</a></p>
             </div>
 

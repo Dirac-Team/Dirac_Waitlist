@@ -29,16 +29,16 @@ function upgradeUrlForKey(key: string) {
 }
 
 function renderEmailHtml(params: {
-  type: "day3" | "postExpiry";
+  type: "midTrial" | "postExpiry";
   licenseKey: string;
   upgradeUrl: string;
   trialEndsAtIso?: string | null;
 }) {
   const title =
-    params.type === "day3" ? "Your Dirac trial is ending soon" : "Your Dirac trial has ended";
+    params.type === "midTrial" ? "Quick check-in: how is Dirac going?" : "Your Dirac trial has ended";
   const subtitle =
-    params.type === "day3"
-      ? "Keep using Dirac without interruption."
+    params.type === "midTrial"
+      ? "If Dirac is saving you time, you can upgrade anytime (one click)."
       : "If you want to keep using Dirac, you can upgrade in one click.";
 
   return `<!DOCTYPE html>
@@ -120,22 +120,26 @@ export async function POST(request: NextRequest) {
     const licensesRef = db.collection("licenses");
 
     const now = new Date();
-    const nowPlus24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    // Mid-trial reminder (Day 6–7 of a 10-day trial): 3–4 days remaining
+    const nowPlus3d = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+    const nowPlus4d = new Date(now.getTime() + 4 * 24 * 60 * 60 * 1000);
     const nowMinus48h = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
-    let day3Sent = 0;
+    let midTrialSent = 0;
     let postExpirySent = 0;
     const errors: Array<{ phase: string; docId?: string; message: string }> = [];
 
-    // Day 3 reminder: trial ends within 24h, and not expired yet
-    const day3Snap = await licensesRef
+    // Mid-trial reminder: trial has 3–4 days remaining, and not expired yet
+    const midTrialSnap = await licensesRef
       .where("status", "==", "trial")
-      .where("trialEndsAt", "<=", nowPlus24h)
+      .where("trialEndsAt", ">", nowPlus3d)
+      .where("trialEndsAt", "<=", nowPlus4d)
       .get();
 
-    for (const doc of day3Snap.docs) {
+    for (const doc of midTrialSnap.docs) {
       const data = doc.data() as any;
-      if (data.trialReminderSentDay3 === true) continue; // treat missing as not-sent
+      // Backwards compatible: older docs may only have trialReminderSentDay3
+      if (data.trialReminderSentDay7 === true || data.trialReminderSentDay3 === true) continue; // treat missing as not-sent
       const trialEndsAt = toDateMaybe(data.trialEndsAt);
       if (!trialEndsAt) continue;
       if (trialEndsAt <= now) continue; // already expired
@@ -149,9 +153,9 @@ export async function POST(request: NextRequest) {
         await resend.emails.send({
           from: "peter@dirac.app",
           to: email,
-          subject: "Your Dirac trial is ending soon",
+          subject: "How’s Dirac going? (Quick check-in)",
           html: renderEmailHtml({
-            type: "day3",
+            type: "midTrial",
             licenseKey,
             upgradeUrl,
             trialEndsAtIso: trialEndsAt.toISOString(),
@@ -159,14 +163,16 @@ export async function POST(request: NextRequest) {
         });
 
         await doc.ref.update({
+          trialReminderSentDay7: true,
+          trialReminderSentDay7At: FieldValue.serverTimestamp(),
+          // Legacy fields (so we never double-send if older logic is reintroduced)
           trialReminderSentDay3: true,
-          trialReminderSentDay3At: FieldValue.serverTimestamp(),
         });
-        day3Sent++;
+        midTrialSent++;
       } catch (err: any) {
-        console.error("Day3 reminder failed", { docId: doc.id, err });
+        console.error("Mid-trial reminder failed", { docId: doc.id, err });
         errors.push({
-          phase: "day3_send",
+          phase: "mid_trial_send",
           docId: doc.id,
           message: err?.message || String(err),
         });
@@ -221,10 +227,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: true,
-        day3Candidates: day3Snap.size,
+        midTrialCandidates: midTrialSnap.size,
         postExpiryCandidates: postExpirySnap.size,
-        day3Sent,
+        midTrialSent,
         postExpirySent,
+        legacy: {
+          // Keep old keys for any existing scripts/monitoring that expect them
+          day3Candidates: midTrialSnap.size,
+          day3Sent: midTrialSent,
+        },
         errors,
         note:
           "If this endpoint 500s with a Firestore 'requires an index' error, create a composite index for collection 'licenses' on fields: status (ASC), trialEndsAt (ASC).",

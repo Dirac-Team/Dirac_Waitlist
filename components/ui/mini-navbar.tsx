@@ -25,7 +25,7 @@ export function Navbar() {
   ];
 
   return (
-    <header className="fixed top-6 left-1/2 transform -translate-x-1/2 z-20
+    <header className="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100]
                        flex items-center justify-center
                        px-4 md:px-6 py-3 backdrop-blur-sm
                        rounded-full

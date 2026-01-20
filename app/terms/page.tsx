@@ -48,8 +48,8 @@ export default function TermsPage() {
 
           <h3>3.2 Free Trial</h3>
           <p>
-            New users receive a 4-day free trial. No payment is required during the trial period. Your subscription will begin 
-            automatically at the end of the trial period unless you cancel before the trial ends.
+            New users receive a 10-day free trial. No payment is required during the trial period. If you want to keep using Dirac
+            after the trial, you can upgrade at any time.
           </p>
 
           <h3>3.3 Subscription Fees</h3>
