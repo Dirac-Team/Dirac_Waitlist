@@ -38,6 +38,8 @@ export function Hero({
   }, [rotatingWords.length]);
 
   const rotatingWord = rotatingWords[wordIdx] ?? "automated";
+  const gradientText =
+    "bg-gradient-to-br from-black from-30% to-black/40 dark:from-white dark:to-white/40 bg-clip-text text-transparent";
 
   return (
     <section
@@ -85,22 +87,21 @@ export function Hero({
       {/* Animated Slogan */}
       <h1
         className="animate-fade-in -translate-y-4 text-balance 
-        bg-gradient-to-br from-black from-30% to-black/40 
-        bg-clip-text py-6 text-4xl font-bold leading-none tracking-tighter 
-        text-transparent sm:text-5xl md:text-6xl lg:text-7xl 
-        dark:from-white dark:to-white/40 mb-4"
+        py-6 text-4xl font-bold leading-none tracking-tighter 
+        sm:text-5xl md:text-6xl lg:text-7xl mb-4"
         style={{ lineHeight: '1.1' }}
       >
-        Morning context,{" "}
+        <span className={gradientText}>Morning context,{" "}</span>
         <span
           className={[
             "inline-block will-change-transform transition-all duration-200 ease-out",
+            gradientText,
             isFading ? "opacity-0 -translate-y-[2px]" : "opacity-100 translate-y-0",
           ].join(" ")}
         >
           {rotatingWord}
-        </span>{" "}
-        in 30 seconds.
+        </span>
+        <span className={gradientText}>{" "}in 30 seconds.</span>
       </h1>
 
       {/* Title (optional) */}
