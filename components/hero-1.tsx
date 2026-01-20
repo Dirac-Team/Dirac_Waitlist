@@ -32,8 +32,8 @@ export function Hero({
       window.setTimeout(() => {
         setWordIdx((i) => (i + 1) % rotatingWords.length);
         setIsFading(false);
-      }, 180);
-    }, 1700);
+      }, 320);
+    }, 2400);
     return () => clearInterval(interval);
   }, [rotatingWords.length]);
 
@@ -94,9 +94,9 @@ export function Hero({
         <span className={gradientText}>Morning context,{" "}</span>
         <span
           className={[
-            "inline-block will-change-transform transition-all duration-200 ease-out",
+            "inline-block will-change-transform transition-all duration-500 ease-in-out",
             gradientText,
-            isFading ? "opacity-0 -translate-y-[2px]" : "opacity-100 translate-y-0",
+            isFading ? "opacity-0 -translate-y-[4px] blur-[1px]" : "opacity-100 translate-y-0 blur-0",
           ].join(" ")}
         >
           {rotatingWord}
