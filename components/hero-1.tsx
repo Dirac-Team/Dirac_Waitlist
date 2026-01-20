@@ -2,6 +2,7 @@
 
 import { ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useEffect, useMemo, useState } from "react"
 
 interface HeroProps {
   eyebrow?: string
@@ -18,6 +19,25 @@ export function Hero({
   ctaLabel = "Explore Now",
   ctaHref = "#",
 }: HeroProps) {
+  const rotatingWords = useMemo(
+    () => ["automated", "summarized", "condensed", "gathered", "ready", "done"],
+    []
+  );
+  const [wordIdx, setWordIdx] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsFading(true);
+      window.setTimeout(() => {
+        setWordIdx((i) => (i + 1) % rotatingWords.length);
+        setIsFading(false);
+      }, 180);
+    }, 1700);
+    return () => clearInterval(interval);
+  }, [rotatingWords.length]);
+
+  const rotatingWord = rotatingWords[wordIdx] ?? "automated";
 
   return (
     <section
@@ -71,7 +91,16 @@ export function Hero({
         dark:from-white dark:to-white/40 mb-4"
         style={{ lineHeight: '1.1' }}
       >
-        Morning context: 30 seconds, not 20 minutes
+        Morning context,{" "}
+        <span
+          className={[
+            "inline-block will-change-transform transition-all duration-200 ease-out",
+            isFading ? "opacity-0 -translate-y-[2px]" : "opacity-100 translate-y-0",
+          ].join(" ")}
+        >
+          {rotatingWord}
+        </span>{" "}
+        in 30 seconds.
       </h1>
 
       {/* Title (optional) */}
