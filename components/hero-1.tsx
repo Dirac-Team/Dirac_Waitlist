@@ -174,35 +174,6 @@ export function Hero({
               <div className="absolute top-[25%] left-[48%] w-16 h-[1px] bg-white rotate-[55deg] opacity-60"></div>
             </div>
           </a>
-
-          {/* Buttons directly under CTA */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a 
-              href="https://www.producthunt.com/products/dirac-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-dirac-2"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <img 
-                alt="Dirac on Product Hunt"
-                width="250"
-                height="54"
-                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056521&theme=light&t=1767757210891"
-                className="block"
-              />
-            </a>
-
-            <a
-              href="https://discord.gg/FSwUGemY"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center h-[54px] px-5 rounded-lg font-bold
-                         bg-[#5865F2] text-white border border-black/10 shadow-lg
-                         hover:bg-[#6b76ff] transition-colors"
-            >
-              Join our Discord
-            </a>
-          </div>
         </div>
       )}
 

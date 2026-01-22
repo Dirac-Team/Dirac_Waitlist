@@ -6,6 +6,34 @@ export default function Home() {
   return (
     <>
       <Navbar />
+      {/* Top-left links (moved from under hero) */}
+      <div className="fixed top-6 left-6 z-[50] flex flex-col sm:flex-row items-start gap-3">
+        <a
+          href="https://www.producthunt.com/products/dirac-2?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-dirac-2"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow bg-white"
+        >
+          <img
+            alt="Dirac on Product Hunt"
+            width="200"
+            height="43"
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1056521&theme=light&t=1767757210891"
+            className="block"
+          />
+        </a>
+
+        <a
+          href="https://discord.gg/FSwUGemY"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center h-[43px] px-4 rounded-lg font-bold
+                     bg-[#5865F2] text-white border border-black/10 shadow-lg
+                     hover:bg-[#6b76ff] transition-colors"
+        >
+          Join our Discord
+        </a>
+      </div>
       <Hero
         eyebrow="10-Day Free Trial"
         subtitle="No more checking all your daily tabs manually. One click -> one summary with everything you need to know to start your work."

@@ -230,6 +230,8 @@ export async function POST(request: NextRequest) {
                             </p>
                             
                             <p style="margin: 32px 0 0 0; font-size: 15px; color: #999; line-height: 1.6;">
+                              Join our Discord (support + updates): <a href="https://discord.gg/FSwUGemY" style="color: #ff6a35; text-decoration: none;">discord.gg/FSwUGemY</a>
+                              <br/>
                               Need help? Reply to this email or contact us at <a href="mailto:peter@dirac.app" style="color: #ff6a35; text-decoration: none;">peter@dirac.app</a>
                             </p>
                           </div>

@@ -582,6 +582,17 @@ function OnboardingContent() {
             <div className="text-sm text-gray-500 space-y-1">
               <p>We emailed a copy of your license key and download links to {email}.</p>
               <p>
+                Join our Discord (support + updates):{" "}
+                <a
+                  className="underline"
+                  href="https://discord.gg/FSwUGemY"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  https://discord.gg/FSwUGemY
+                </a>
+              </p>
+              <p>
                 Need the other build?{" "}
                 <a className="underline" href={effectiveDownloadUrls.intel}>
                   Intel
